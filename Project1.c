@@ -1,8 +1,10 @@
 #include <stdio.h>
 
 /* 
-Group number: 
+Group number: 3
 Team members: 
+Nick Benevento
+
 */
 
 /* PROJECT 1 */
