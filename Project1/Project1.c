@@ -95,11 +95,18 @@ int ques3(int x){
 /* question 4 */
 /* Assume 0 <= n <= 32 */
 int ques4(int n) {
+    /*  The ! operator is boolean not, so it switches between true and false (where false = 0, and true is any other value.
+    Thus, if n is 0, then it will stay 0, and if it is any other number, n will be 1. So, x will be 0 if n is 0, otherwise
+    x will become -2147483648*/
     int x = (!!n) << 31;
+    /* If x is 0, it stays 0. Otherwise, x is -1 */
     x = x >> 31;
+    /* y is initialized as the largest negative number, -2147483648 */
     int y = (1 << 31);
+    /* Since the complement of 0 is still 0, this divides y by 2^n */
     y = y >> (n + (~0));
 
+    /* if x is 0, this will always return 0. Otherwise, it will return -2147483648 divided by 2^(n-1) */
     return x & y;
 }
 
@@ -178,7 +185,9 @@ int ques10(int x) {
 /* question 11 */
 
 int ques11(int x, int y) {
+    /* If x was negative, a becomes -1. Otherwise a becomes 0 */
 	int a = x >> 31;
+    /* If y was negative, b becomes -1. Otherwise b becomes 0 */
 	int b = y >> 31;
 
     return !((!a & b) | (!(a ^ b) & (y+~x)>>31));
