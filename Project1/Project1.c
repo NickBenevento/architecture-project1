@@ -107,11 +107,24 @@ int ques4(int n) {
 /* question 5 */
 
 int ques5(int x) {
+    /* Shifts the number 31 bits to the left. If the number had a 1 in the right most bit, this turns the number
+    into the greatest negative number, -2147483648. Otherwise, the number becomes 0 */
     int result = (x<<31);
+    /* Shifting the number back to the right pads the left-most 31 bits with the sign bit, either 0 or 1.
+    This means that if the number was originally even, it becomes 0. Otherwise, the number becomes -1. */
     result = (result >> 31);
 
+    /* Essentially the same as saying, if the original number was even, return 0. Returns -1 if the number is odd */
     return result;
+}
 
+/* Returns 0 if x is even, and -1 if x is odd */
+
+int ans5(int x) {
+    if(x%2 == 0)
+        return 0;
+    else
+        return -1;
 }
 
 /* question 6 */
@@ -235,22 +248,28 @@ main(){
     int a, b;
 
     int t1;
+    int t2;
+    int t3;
+    int t4;
+    int t5;
+    int t6;
 
- 	printf("Enter first number, an integer stored into variable A preferably between 1 and 20:");
+ 	printf("Enter first number, an integer stored into variable A preferably between 1 and 20: ");
  	scanf ("%d",&a);
 	printf("\n");
- 	printf("Enter second number, an integer stored into variable B preferably between 1 and 20:");
+ 	printf("Enter second number, an integer stored into variable B preferably between 1 and 20: ");
  	scanf ("%d", &b);
 	printf("\n");
 
 
-	printf("you entered a= %d b= %d  \n", a,b);
+	printf("you entered a = %d b = %d  \n", a,b);
 
 
 	t1=ques0(a,b);
 	printf("output of ques0 is t1 = %d  \n", t1);
     /* To test/run the functions, you will need to input numbers and then call each of the functions, and print the return value */
-
+    t6 = ques5(a);
+    printf("Output of ques5 is t6 = %d\n", t6);
 
 	return 0;
 }
