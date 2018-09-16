@@ -3,7 +3,7 @@
 /* 
 Group number: 3
 Team members: 
-Nick Benevento
+Nick Benevento (Questions 4-6, 11, 14)
 
 */
 
@@ -103,7 +103,7 @@ int ques4(int n) {
     x = x >> 31;
     /* y is initialized as the largest negative number, -2147483648 */
     int y = (1 << 31);
-    /* Since the complement of 0 is still 0, this divides y by 2^n */
+    /* y is shifted to the right by n-1, since the complement of 0 is -1 */
     y = y >> (n + (~0));
 
     /* if x is 0, this will always return 0. Otherwise, it will return -2147483648 divided by 2^(n-1) */
@@ -126,7 +126,6 @@ int ques5(int x) {
 }
 
 /* Returns 0 if x is even, and -1 if x is odd */
-
 int ans5(int x) {
     if(x%2 == 0)
         return 0;
@@ -137,15 +136,20 @@ int ans5(int x) {
 /* question 6 */
 
 int ques6(void) {
+    /* the number 0101 0101 in binary, or 85 in decimal */
     int byte = 0x55;
+    /* shifts the number one byte to the left, and ors it with the original. So,it basically
+    doubles the binary sting from 0101 0101 to 0101 0101 0101 0101 */
     int word = byte | byte<<8;
-
+    /* This return statement does something very similar to the line above it, but shifts the int over 2 bytes and
+    then ors it. So, the final binary string that is returned is altenating 0101s. This is equivalent to 
+    0x55555555 in hex, or 1,453,655,765 in decimal. It could be worth noting that the string 0101 0101 is equivalent 
+    to the character U. */
     return word | word<<16;
 }
 
 
-    /* question 7 */
-
+/* question 7 */
 int ques7(int x) {
 
     return x & (~x+1);
@@ -190,6 +194,17 @@ int ques11(int x, int y) {
     /* If y was negative, b becomes -1. Otherwise b becomes 0 */
 	int b = y >> 31;
 
+    /* This can be broken up into two expressions separated by the | sign. The first part,
+    (!a & b), switches a to 0 if it was previously -1, or switches it to 1 if it was 0. This 
+    is then anded with b. The second part of the equation is a little more complicated, but starts with 
+    !(a ^ b). This uses the exclusive or operator between a and b, which will only become -1 if a and b
+    are different, and 0 otherwise. This answer is then flipped by the ! operator. next, this
+    is anded with the other expression, which adds y to the complement of x, and shifts that answer
+    31 spaces to the right. So, this will become either 0 or -1, depending on the values of x and y.
+    The first and second part of the expression is or'd together, and then the final answer is flipped 
+    due to the ! operator in front of the whole expression.
+    A much easier way to write the same line is to say: return (x && !y) , which was 
+    found using a truth table. */
     return !((!a & b) | (!(a ^ b) & (y+~x)>>31));
 }
 
@@ -227,7 +242,9 @@ int ques13(int x) {
     return x;
 }
 
-/* question 14 */
+/* question 14 
+If the number in binary has an even number of 1's, the function returns 0. If the number in binary
+has an odd amount of 1s, the function returns 1 */
 int ques14(int x) {
     int result = 0;
     int i;
