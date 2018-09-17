@@ -231,9 +231,13 @@ int ques9(int x, int n, int c) {
 
 int ques10(int x) {
 	int y = !!x; /* if x was 0, it stays 0. Otherwise, x becomes 1 */
-	int z = (!(x+x));
-
-    return y & z;
+    
+    /* using the ! operator with anything except 0 results in 0. So, if x is anything
+    except 0, z becomes 0 */
+	int z = (!(x+x)); 
+    /* if x was 0, then y wil become 0, so this wil return 0. If x wasn't 0, then z becomes 0, 
+    so this will still return 0. It always returns 0 regardless of the value of x */
+    return y & z; 
 }
 
 /* the function always returns 0 */
