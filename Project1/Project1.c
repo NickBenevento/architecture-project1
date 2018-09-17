@@ -67,47 +67,61 @@ int ans0(int x, int y){
 int ques1(int x)
 {
     int z;
-    int y  = ~x+1;
-    z= (~(y|x));
-    z = (z >> 31);
+    int y  = ~x+1;//int y equals to the two's complement plus 1
+    z= (~(y|x));//int z equals to the complement of (y OR x).
+		//In OR operation, when x is 1 and y is 0, it outputs 1. When x is 0 and y is 1, it outputs 1. 
+		//When x and y both be 0, it outputs 0. When x and y both be 1, it outputs 1.
+    z = (z >> 31);//z equals to the first bit of z after right shift 31 times.
+		  //z is the first bit of z after right shift 31 times.
+		  //If the first bit is 1, which means that it is a negative number. If the first bit is 0, whcih means it is a positive number.
 
-    return (z & 1);
+    return (z & 1);//returns z AND 1.
+		   //In AND operation, only when x and y both be 1, it outputs 1. Else, it outputs 0.
+		   //For this function, if x is 0, the function output is 1. Else, the function output is 0.
+
 
 }
+
 int ans1(int x)
 {
-    return (!x);
+    return (!x);// return NOT x.
 }
 
 /* question 2 */
 int ques2(int x) {
-    int mask = x>>31;
-    int y= (x ^ mask);
-    int z = (~mask + 1);
+    int mask = x>>31;// int mask is the first bit after int x right shift 31 times.
+		     // If mask is 0, which means that x is a positive number. If mask is 1, which means that x is a negative number.
+    int y= (x ^ mask);//int y equals to x XOR mask.
+		      //In XOR operation, if x is 1 and y is 0, it outputs 1. If x is 0 and y is 1, it outputs 1. Else it outputs 0.
+    int z = (~mask + 1);//int z equals to the two's complement if mask adds 1.
 
     return (y+z);
 }
 
 int ans2(int x)
 {
-   return abs(x);
+   return abs(x);//returns the absolute value of x.
 }
 
 /* question 3 */
 int ques3(int x)
 {
-    int y = !x;
-    int z = x >> 31;
-    z = z | y;
+    int y = !x;//int y equals to NOT x.
+	       //in NOT operation, when x is 0, results 1. When x is 1, results 0.
+    int z = x >> 31;//int z is the first bit of x after x right shift 31 times.
+		    //If z is 0, x is a positive number. If z is 1, x is a negative number.
+    z = z | y;//z equals to z OR y.
+	      //For this function, if x is a positive number, the output is 1. If x is a negative number, the output is 0.
 
-    return !z;
+    return !z;//returns NOT z.
 }
+
 int ans3(int x)
 {
   if(x<0)
     return 0;
   else
-    return !!x;
+    return !!x;//returns NOT NOT x.
 }
 
 
