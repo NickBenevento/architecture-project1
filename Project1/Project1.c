@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <math.h>
 /* 
 Group number: 3
 Team members: 
@@ -110,6 +110,16 @@ int ques4(int n) {
     return x & y;
 }
 
+int ans4(int n) {
+    if(n == 0) {
+        return 0;
+    }
+    else {
+        int y = -2147483648;
+        int divisor = pow(2, (n-1));
+        return y/divisor;
+    }
+}
 
 /* question 5 */
 
@@ -146,6 +156,11 @@ int ques6(void) {
     0x55555555 in hex, or 1,453,655,765 in decimal. It could be worth noting that the string 0101 0101 is equivalent 
     to the character U. */
     return word | word<<16;
+}
+
+/* returns a string of alternating 0's and 1's, which is equal to the number 1,453,655,765 */
+int ans6(void) {
+    return 0x55555555;
 }
 
 
@@ -208,6 +223,18 @@ int ques11(int x, int y) {
     return !((!a & b) | (!(a ^ b) & (y+~x)>>31));
 }
 
+int ans11(int x, int y) {
+    if(x >= 0)
+        x = 0;
+    else 
+        x = -1;
+    if(y >= 0)
+        y = 0;
+    else
+        y = -1;
+    return (x && !y);
+}
+
 
 /* question 12 */
 int ques12(int x, int m, int n) {
@@ -255,6 +282,19 @@ int ques14(int x) {
     return result;
 }
 
+int ans14(int x) {
+    int counter = 0;
+    for(int i = 0; i < 32; i++) {
+        int temp = 1;
+        temp = temp & x;
+        if(temp == 1) {
+            counter++;
+        }
+        x = x >> 1;
+    }
+    return !(counter %2 == 0);
+}
+
 /* question 15 */
 
 int ques15(int x, int n) {
@@ -269,8 +309,7 @@ int ques15(int x, int n) {
 
 
 
-int
-main(){
+int main(){
     int a, b;
 
     int t1;
@@ -294,8 +333,28 @@ main(){
 	t1=ques0(a,b);
 	printf("output of ques0 is t1 = %d  \n", t1);
     /* To test/run the functions, you will need to input numbers and then call each of the functions, and print the return value */
-    t6 = ques5(a);
-    printf("Output of ques5 is t6 = %d\n", t6);
+    t1 = ques4(a);
+    printf("Output of ques4 is t1 = %d\n", t1);
+    t1 = ans4(a);
+    printf("Output of ans4 is t1 = %d\n", t1);
+    t1 = ques5(a);
+    printf("Output of ques5 is t1 = %d\n", t1);
+    t1 = ans5(a);
+    printf("Output of ans5 is t1 = %d\n", t1);
+    t1 = ques6();
+    printf("Output of ques6 is t1 = %d\n", t1);
+    t1 = ans6();
+    printf("Output of ans6 is t1 = %d\n", t1);
+
+    t1 = ques11(a, b);
+    printf("Output of ques11 is t1 = %d\n", t1);
+    t1 = ans11(a, b);
+    printf("Output of ans11 is t1 = %d\n", t1);
+
+    t1 = ques14(a);
+    printf("Output of ques14 is t1 = %d\n", t1);
+    t1 = ans14(a);
+    printf("Output of ans14 is t1 = %d\n", t1);
 
 	return 0;
 }
