@@ -187,10 +187,14 @@ int ans6(void) {
 
 /* question 7 */
 int ques7(int x) {
-
+    /* Although this line looks simple, it is actually quite complicated. Basically, it 
+    takes the right-most bit of the binary string x and returns what that number is. So, if the number is 
+    8 (1000), the function returns 8. If the number is 6 (0110), the function returns 2. */
     return x & (~x+1);
 }
 
+/* Although this code might not have less operations, it is much more readable and easier to 
+see what the function does. */
 int Ans7(int x) // x & -x
 {
   int i=0;
@@ -203,6 +207,7 @@ int Ans7(int x) // x & -x
     x= x>>1;
     i++;
   }
+}
 
 /* question 8 */
 int ques8(int x) { //SIGN CHECK
