@@ -422,21 +422,22 @@ int ques15(int x, int n) {
     return (z & x);  // trucates x after the nth bit
 }
 
+/* returns the first n bits of x */
 int ans15(int x, int n)
 {
-  int z=1;
   int count=0;
   int i=0;
   while(i<n)  //counts the first n bits of x 
   {
     int temp =1;
     temp= temp & x;
+    /* if there was a 1 in the bit of x, add that value to count */
     if(temp==1)
     {
-      count =count + pow(2, i);
+      count =count + pow(2, i); /* have to add 2 raised to the power of i since each bit increases value by 2x */
     }
    
-    x= x>>1;
+    x= x>>1; /* shift the bits of x over by 1 */
     i++;
   }
   return count; 
