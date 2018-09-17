@@ -130,15 +130,14 @@ int ques4(int n) {
 }
 
 int ans4(int n) {
+    /* return 0 if n = 0 */
     if(n == 0) {
         return 0;
     }
+    /* otherwise, return y divided by 2^(n-1) */
     else {
         int y = -2147483648;
-        //y = y/pow(2, (n-1));
-        for(int i = 0; i < (n-1); i++){
-            y /= 2;
-        }
+        y = y/pow(2, (n-1));
         return y;
     }
 }
@@ -231,7 +230,7 @@ int ques9(int x, int n, int c) {
 
 int ques10(int x) {
 	int y = !!x; /* if x was 0, it stays 0. Otherwise, x becomes 1 */
-    
+
     /* using the ! operator with anything except 0 results in 0. So, if x is anything
     except 0, z becomes 0 */
 	int z = (!(x+x)); 
