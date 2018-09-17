@@ -198,13 +198,18 @@ see what the function does. */
 int Ans7(int x) // x & -x
 {
   int i=0;
+  /* loops through the bits of x */
   while(i<32)
   {
     int temp =1;
-    temp= temp & x;
+    temp= temp & x; /* temp will only be 1 if there is a 1 in the right-most bit of x */
+    /* if temp is 1, then the function returns 2 to the power of i, which is how many times the 
+    binary string was shifted right. This gets the original value of what the 1 in the string was.
+    For example, if x was 0110, the function would return 2^1, since it would take 1 shift to get the
+    1 in the right-most bit */
     if(temp==1)
       return pow(2,i);
-    x= x>>1;
+    x= x>>1; /* shifts the bits of x over to the right by 1 */
     i++;
   }
 }
