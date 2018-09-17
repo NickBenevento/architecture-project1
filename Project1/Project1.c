@@ -251,10 +251,10 @@ int ans8(int x)
 /* question 9 */
 
 int ques9(int x, int n, int c) {
-    int n8 = n << 3;
-    int mask = 0xff << n8;
-    int cshift = c << n8;
-    int z= (x & ~mask);
+    int n8 = n << 3; //multiplies n by 8 
+    int mask = 0xff << n8; //multiplies 255 (decimal for 0xff) by 2 raised to n8
+    int cshift = c << n8; //multiplies c by 2 raised to n8
+    int z= (x & ~mask); 
 
     return (z  | cshift);
 }
