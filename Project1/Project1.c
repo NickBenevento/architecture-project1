@@ -227,11 +227,13 @@ int ques9(int x, int n, int c) {
 /* question 10 */
 
 int ques10(int x) {
-	int y = !!x;
+	int y = !!x; /* if x was 0, it stays 0. Otherwise, x becomes 1 */
 	int z = (!(x+x));
 
     return y & z;
 }
+
+/* the function always returns 0 */
 int ans10(int x)
 {
   return 0;
@@ -255,19 +257,27 @@ int ques11(int x, int y) {
     The first and second part of the expression is or'd together, and then the final answer is flipped 
     due to the ! operator in front of the whole expression.
     A much easier way to write the same line is to say: return (x && !y) , which was 
-    found using a truth table. */
+    found using a truth table, since there can only be 2 values for a and b */
     return !((!a & b) | (!(a ^ b) & (y+~x)>>31));
 }
 
+/* there can only be 4 different combinations for x and y after they are passed in,
+so  this function is a much simpler way to output the same answers as question 11 */
 int ans11(int x, int y) {
+    /* if x was greater than or equal to 0, it becomes 0. */
     if(x >= 0)
         x = 0;
     else 
-        x = -1;
+        x = -1; /* otherwise, x is -1 */
+    /* if y was greater than or equal to 0, it becomes 0 */
     if(y >= 0)
         y = 0;
     else
-        y = -1;
+        y = -1; /* otherwise, it becomes -1 */
+
+    /* returns either true or false depending on the values of x and y, according
+    to the truth table that was constructed for question 11 (truth table is in the 
+    explanation document) */
     return (x && !y);
 }
 
@@ -312,19 +322,23 @@ int ques13(int x) {
     return x;
 }
 
+/* uses a for loop to count the number of 1's in the binary string of x and returns that number */
 int ans13(int x)
 {
-  int count=0;
+  int count=0; /* counter variable to count the number of 1's. */
   int i=0;
+  /* loops through all the bits of x */
   while(i<32)
   {
-    int temp =1;
-    temp= temp & x;
+    int temp =1; /* temp variable with value of 1 */
+    temp= temp & x; /* bitwise and operator with x and temp.Temp will only become 1 if x has a 1 in the right-most bit */
+    /* if temp was 1, then add 1 to the counter since there was a 1 in x */
     if(temp==1)
       count++;
-    x= x>>1;
+    x= x>>1; /* shift x over by 1 to get the next bit value */
     i++;
   }
+  /* returns how many 1's are in the binary string of x */
   return count;
 }
 
