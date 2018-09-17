@@ -482,7 +482,7 @@ int main(){
     t1 = ques4(a);
     printf("Output of ques4 is = %d\n", t1);
     t1 = ans4(a);
-    printf("Output of ans4 is = %d\n", t1);
+    printf("Output of ans4 is = %d\n\n", t1);
 
     t1 = ques5(a);
     printf("Output of ques5 is = %d\n", t1);
@@ -505,19 +505,19 @@ int main(){
     printf("Output of ans8 is = %d\n\n", t1);
 
     t1 = ques9(a, b, c);
-    printf("Output of ques9 is = %d\n", t1);
+    printf("Output of ques9 is = %d\n\n", t1);
     //t1 = ans9(a, b, c);
-    //printf("Output of ans9 is = %d\n", t1);
+    //printf("Output of ans9 is = %d\n\n", t1);
 
     t1= ques10(a);
     printf("Output of ques10 is = %d\n", t1);
     t1 = ans10(a);
-    printf("Output of ans10 is = %d\n", t1);
+    printf("Output of ans10 is = %d\n\n", t1);
 
     t1 = ques11(a, b);
     printf("Output of ques11 is = %d\n", t1);
     t1 = ans11(a, b);
-    printf("Output of ans11 is = %d\n", t1);
+    printf("Output of ans11 is = %d\n\n", t1);
 
     t1 = ques12(a, b, c);
     printf("Output of ques12 is = %d\n", t1);
@@ -532,7 +532,7 @@ int main(){
     t1 = ques14(a);
     printf("Output of ques14 is = %d\n", t1);
     t1 = ans14(a);
-    printf("Output of ans14 is = %d\n", t1);
+    printf("Output of ans14 is = %d\n\n", t1);
 
     t1 = ques15(a, b);
     printf("Output of ans15 is = %d\n", t1);
