@@ -345,15 +345,15 @@ int ans12(int x, int m, int n)
 
 int ques13(int x) {
 
-    int mask1, mask2, mask4, mask8, mask16;
+    int mask1, mask2, mask4, mask8, mask16;//The function uses 5 masks to check for number of 1 in the binary string.
 
-    mask2 = 0x33 + (0x33 << 8);
+    mask2 = 0x33 + (0x33 << 8);//mask2 repeats "0011" eight times
     mask2 += mask2 << 16;
-    mask1 = mask2 ^ (mask2 << 1);
-    mask4 = 0x0F + (0x0F << 8);
+    mask1 = mask2 ^ (mask2 << 1);//mask1 repeats "01" sixteen times.
+    mask4 = 0x0F + (0x0F << 8);//mask 4 repeats "0000 1111" four times.
     mask4 += mask4 << 16;
-    mask8 = 0xFF + (0xFF << 16);
-    mask16 = 0xFF + (0xFF << 8);
+    mask8 = 0xFF + (0xFF << 16);//mask 8 repeats "0000 0000 1111 1111" two times.
+    mask16 = 0xFF + (0xFF << 8);//mask 16 repeats "0000 0000 0000 0000 1111 1111 1111 1111" one time.
 
     x = (x & mask1) + ((x >> 1) & mask1);
     x = (x & mask2) + ((x >> 2) & mask2);
@@ -361,7 +361,7 @@ int ques13(int x) {
     x = (x & mask8) + ((x >> 8) & mask8);
     x = (x & mask16) + ((x >> 16) & mask16);
 
-    return x;
+    return x;//For this function, it returns the number of 1 in the binary string. 
 }
 
 /* uses a for loop to count the number of 1's in the binary string of x and returns that number */
