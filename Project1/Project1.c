@@ -222,6 +222,8 @@ int ques8(int x) { //SIGN CHECK
     return y | z; //If x is negative this returns -1... if x is 0 this returns 0.... if x is positive this returns 1
 }
 
+/* This function is essentially a sign-check, where it returns 0 if the number is positive,
+-1 if it is negative, and 0 if it is 0 */
 int ans8(int x)
 {
   if(x>0)
@@ -315,6 +317,8 @@ int ques12(int x, int m, int n) {
 
     return !((a|b) >> 31); //If either are negative this is all 1's (-1) which becomes 0 after boolean not... if both are 0 this is positive or 0 this is all 0's (0) which becomes 1 after boolean not
 }
+
+
 int ans12(int x, int m, int n)
 {
   if(m>x || x>n) //This is equivalent to saying if a or b are negative
