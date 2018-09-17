@@ -193,8 +193,16 @@ int ques7(int x) {
 
 int Ans7(int x) // x & -x
 {
-  return (x & -x);
-}
+  int i=0;
+  while(i<32)
+  {
+    int temp =1;
+    temp= temp & x;
+    if(temp==1)
+      return pow(2,i);
+    x= x>>1;
+    i++;
+  }
 
 /* question 8 */
 int ques8(int x) { //SIGN CHECK
