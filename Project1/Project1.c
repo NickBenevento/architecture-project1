@@ -259,6 +259,17 @@ int ques9(int x, int n, int c) {
     return (z  | cshift);
 }
 
+int ans9(int x, int n, int c)
+{
+    int n8= n*8;
+    int mask = 255* pow(2, n8);
+    int cshift = c* pow(2, n8);
+    int z= (x & ~mask);
+    
+    return (z| cshift);
+  }
+
+
 
 /* question 10 */
 
