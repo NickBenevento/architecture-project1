@@ -195,11 +195,11 @@ int Ans7(int x) // x & -x
 }
 
 /* question 8 */
-int ques8(int x) {
-    int y = x >> 31;
-    int z = !!x;
+int ques8(int x) { //SIGN CHECK
+    int y = x >> 31; //if x is negative y is all 1's(-1)... if x is positive y is all 0's (0)
+    int z = !!x; //If x is zero z is zero... if x is anything else z is 1
 
-    return y | z;
+    return y | z; //If x is negative this returns -1... if x is 0 this returns 0.... if x is positive this returns 1
 }
 
 int Ans8(int x)
@@ -274,16 +274,16 @@ int ans11(int x, int y) {
 
 /* question 12 */
 int ques12(int x, int m, int n) {
-    int a = ~m+1;
-    int b = ~x +1;
-    a = x + a;
-    b = b + n;
+    int a = ~m+1;  //2's compliment so -a
+    int b = ~x +1; //2's compliment so -x
+    a = x + a;  //-m+x
+    b = b + n;  //-x+n
 
-    return !((a|b) >> 31);
+    return !((a|b) >> 31); //If either are negative this is all 1's (-1) which becomes 0 after boolean not... if both are 0 this is positive or 0 this is all 0's (0) which becomes 1 after boolean not
 }
 int Ans12(int x, int m, int n)
 {
-  if(m>x || x>n)
+  if(m>x || x>n) //This is equivalent to saying if a or b are negative
     return 0;
   else
     return 1;
@@ -346,7 +346,7 @@ int ans14(int x) {
     for(int i = 0; i < 32; i++) {
         int temp = 1;
         temp = temp & x;
-        if(temp == 1) {
+        if(temp == 1)
             counter++;
         }
         x = x >> 1;
@@ -359,10 +359,10 @@ int ans14(int x) {
 int ques15(int x, int n) {
     /* for ques15 only, assume n is not a negative number  */
 
-    int temp = (1 << n);
-    int z = temp + ~0;
+    int temp = (1 << n); //2 raised to the n
+    int z = temp + ~0; //temp-1 which is all 0's with n 1's at the end
 
-    return (z & x);
+    return (z & x);  // trucates x after the nth bit
 }
 
 int Ans15(int x, int n)
@@ -370,7 +370,7 @@ int Ans15(int x, int n)
   int z=1;
   int count=0;
   int i=0;
-  while(i<n)
+  while(i<n)  //counts the first n bits of x 
   {
     int temp =1;
     temp= temp & x;
@@ -382,7 +382,7 @@ int Ans15(int x, int n)
     x= x>>1;
     i++;
   }
-  return count;
+  return count; 
   
 }
 
