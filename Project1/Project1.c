@@ -335,23 +335,38 @@ int ques14(int x) {
     int result = 0;
     int i;
 
+    /* loop through 32 times */
     for (i = 0; i < 32; i++)
+        /* uses the exclusive or function to compare result with the value of x after it has been shifted
+        over i times. This just compares the right most bit of x, and if it is different than the right-most
+        bit of result, then result maintains the value of 1. This process is then repeated from the for loop, 
+        but will only change the value of return whenever there is a 1 in x. So, this loop will only
+        put out a different answer for return depending on how many 1's there are in x (when there is a 1,
+        it flips the value of return). */
         result ^=  (x >> i) & 0x1;
-
+    /* if there are an even amount of 1s in the binary string of x, then this returns 0. If the number of 
+    1's in x is odd, this returns 1 */
     return result;
 }
 
+/* uses a for loop to count the amount of 1's in the binary string of i. Returns
+1 if there are an odd amount, and 0 if there are an even amount */
 int ans14(int x) {
-    int counter = 0;
+    int counter = 0; /* counter to keep track of how many 1's are in the binary string x */
+    /* loops through all the bits of i */
     for(int i = 0; i < 32; i++) {
-        int temp = 1;
-        temp = temp & x;
-        if(temp == 1)
+        int temp = 1; /* creates a temp variable with a value of 1 */
+        /* uses bitwise and operator with temp and x. So, temp will only become 1 if the right-most bit
+        of x is also a 1 */
+        temp = temp & x;  
+        /* If temp is 1, meaning there was a 1 in x, increase the counter */
+        if(temp == 1) {
             counter++;
         }
-        x = x >> 1;
+        x = x >> 1; /* shifts over x by 1, so whatever was in the right-most bit slot is replaced by the value to the left of it */
     }
-    return !(counter %2 == 0);
+    /* if the counter was an even number, returns 0. If counter was odd, return 1 */
+    return (counter %2 != 0);
 }
 
 /* question 15 */
