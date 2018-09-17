@@ -195,7 +195,7 @@ int ques7(int x) {
 
 /* Although this code might not have less operations, it is much more readable and easier to 
 see what the function does. */
-int Ans7(int x) // x & -x
+int ans7(int x) // x & -x
 {
   int i=0;
   /* loops through the bits of x */
@@ -222,7 +222,7 @@ int ques8(int x) { //SIGN CHECK
     return y | z; //If x is negative this returns -1... if x is 0 this returns 0.... if x is positive this returns 1
 }
 
-int Ans8(int x)
+int ans8(int x)
 {
   if(x>0)
     return 1;
@@ -315,7 +315,7 @@ int ques12(int x, int m, int n) {
 
     return !((a|b) >> 31); //If either are negative this is all 1's (-1) which becomes 0 after boolean not... if both are 0 this is positive or 0 this is all 0's (0) which becomes 1 after boolean not
 }
-int Ans12(int x, int m, int n)
+int ans12(int x, int m, int n)
 {
   if(m>x || x>n) //This is equivalent to saying if a or b are negative
     return 0;
@@ -418,7 +418,7 @@ int ques15(int x, int n) {
     return (z & x);  // trucates x after the nth bit
 }
 
-int Ans15(int x, int n)
+int ans15(int x, int n)
 {
   int z=1;
   int count=0;
@@ -463,28 +463,81 @@ int main(){
 	//t1=ques0(a,b);
 	//printf("output of ques0 is t1 = %d  \n", t1);
     /* To test/run the functions, you will need to input numbers and then call each of the functions, and print the return value */
+    
+    t1 = ques1(a);
+    printf("\nOutput of ques1 is = %d\n", t1);
+    t1 = ans1(a);
+    printf("Output of ans1 is = %d\n\n", t1);
+
+    t1 = ques2(a);
+    printf("Output of ques2 is = %d\n", t1);
+    t1 = ans2(a);
+    printf("Output of ans2 is = %d\n\n", t1);
+
+    t1 = ques3(a);
+    printf("Output of ques3 is = %d\n", t1);
+    t1 = ans3(a);
+    printf("Output of ans3 is = %d\n\n", t1);
+
     t1 = ques4(a);
     printf("Output of ques4 is = %d\n", t1);
     t1 = ans4(a);
     printf("Output of ans4 is = %d\n", t1);
+
     t1 = ques5(a);
     printf("Output of ques5 is = %d\n", t1);
     t1 = ans5(a);
-    printf("Output of ans5 is = %d\n", t1);
+    printf("Output of ans5 is = %d\n\n", t1);
+
     t1 = ques6();
     printf("Output of ques6 is = %d\n", t1);
     t1 = ans6();
-    printf("Output of ans6 is = %d\n", t1);
+    printf("Output of ans6 is = %d\n\n", t1);
+
+    t1 = ques7(a);
+    printf("Output of ques7 is = %d\n", t1);
+    t1 = ans7(a);
+    printf("Output of ans7 is = %d\n\n", t1);
+
+    t1 = ques8(a);
+    printf("Output of ques8 is = %d\n", t1);
+    t1 = ans8(a);
+    printf("Output of ans8 is = %d\n\n", t1);
+
+    t1 = ques9(a, b, c);
+    printf("Output of ques9 is = %d\n", t1);
+    //t1 = ans9(a, b, c);
+    //printf("Output of ans9 is = %d\n", t1);
+
+    t1= ques10(a);
+    printf("Output of ques10 is = %d\n", t1);
+    t1 = ans10(a);
+    printf("Output of ans10 is = %d\n", t1);
 
     t1 = ques11(a, b);
     printf("Output of ques11 is = %d\n", t1);
     t1 = ans11(a, b);
     printf("Output of ans11 is = %d\n", t1);
 
+    t1 = ques12(a, b, c);
+    printf("Output of ques12 is = %d\n", t1);
+    t1 = ans12(a, b, c);
+    printf("Output of ans12 is = %d\n\n", t1);
+
+    t1 = ques13(a);
+    printf("Output of ans13 is = %d\n", t1);
+    t1 = ans13(a);
+    printf("Output of ans13 is = %d\n\n", t1);
+
     t1 = ques14(a);
     printf("Output of ques14 is = %d\n", t1);
     t1 = ans14(a);
     printf("Output of ans14 is = %d\n", t1);
+
+    t1 = ques15(a, b);
+    printf("Output of ans15 is = %d\n", t1);
+    t1 = ans15(a, b);
+    printf("Output of ans15 is = %d\n", t1);
 
 	return 0;
 }
