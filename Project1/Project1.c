@@ -64,7 +64,8 @@ int ans0(int x, int y){
 /* QUESTIONS */
 
 /* question 1 */
-int ques1(int x) {
+int ques1(int x)
+{
     int z;
     int y  = ~x+1;
     z= (~(y|x));
@@ -72,6 +73,10 @@ int ques1(int x) {
 
     return (z & 1);
 
+}
+int ans1(int x)
+{
+    return (!x);
 }
 
 /* question 2 */
@@ -83,14 +88,28 @@ int ques2(x) {
     return (y+z);
 }
 
+int ans2(int x)
+{
+   return abs(x);
+}
+
 /* question 3 */
-int ques3(int x){
+int ques3(int x)
+{
     int y = !x;
     int z = x >> 31;
     z = z | y;
 
     return !z;
 }
+int ans3(int x)
+{
+  if(x<0)
+    return 0;
+  else
+    return !!x;
+}
+
 
 /* question 4 */
 /* Assume 0 <= n <= 32 */
@@ -170,6 +189,10 @@ int ques7(int x) {
     return x & (~x+1);
 }
 
+int Ans7(int x) // x & -x
+{
+  return (x & -x);
+}
 
 /* question 8 */
 int ques8(int x) {
@@ -177,6 +200,16 @@ int ques8(int x) {
     int z = !!x;
 
     return y | z;
+}
+
+int Ans8(int x)
+{
+  if(x>0)
+    return 1;
+  else if(x==0)
+    return 0;
+  else
+    return -1;
 }
 
 /* question 9 */
@@ -199,7 +232,10 @@ int ques10(int x) {
 
     return y & z;
 }
-
+int ans10(int x)
+{
+  return 0;
+}
 
 /* question 11 */
 
@@ -245,6 +281,13 @@ int ques12(int x, int m, int n) {
 
     return !((a|b) >> 31);
 }
+int Ans12(int x, int m, int n)
+{
+  if(m>x || x>n)
+    return 0;
+  else
+    return 1;
+}
 
 /* question 13 */
 
@@ -267,6 +310,22 @@ int ques13(int x) {
     x = (x & mask16) + ((x >> 16) & mask16);
 
     return x;
+}
+
+int ans13(int x)
+{
+  int count=0;
+  int i=0;
+  while(i<32)
+  {
+    int temp =1;
+    temp= temp & x;
+    if(temp==1)
+      count++;
+    x= x>>1;
+    i++;
+  }
+  return count;
 }
 
 /* question 14 
@@ -306,6 +365,26 @@ int ques15(int x, int n) {
     return (z & x);
 }
 
+int Ans15(int x, int n)
+{
+  int z=1;
+  int count=0;
+  int i=0;
+  while(i<n)
+  {
+    int temp =1;
+    temp= temp & x;
+    if(temp==1)
+    {
+      count =count + pow(2, i);
+    }
+   
+    x= x>>1;
+    i++;
+  }
+  return count;
+  
+}
 
 
 
@@ -358,3 +437,4 @@ int main(){
 
 	return 0;
 }
+
