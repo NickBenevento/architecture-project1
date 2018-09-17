@@ -4,6 +4,9 @@
 Group number: 3
 Team members: 
 Nick Benevento (Questions 4-6, 11, 14)
+Zach Coveno (Questions 7-9, 12, 15)
+Genchen Li (Questions 1-3, 10. 13)
+Team collaborated, explained and helped each other with all th problems.
 
 */
 
