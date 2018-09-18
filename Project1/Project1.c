@@ -263,13 +263,21 @@ int ques9(int x, int n, int c) {
 }
 
 int ans9(int x, int n, int c)
-{
-    int n8= n*8;
-    int mask = 255* pow(2, n8);
-    int cshift = c* pow(2, n8);
-    int z= (x & ~mask);
+  {
+    if(n>3 || n<0)
+    {
+      int nope =NULL;
+      return nope; //you cant shift more than 31 bits and you can't shift negative ints. These are undefined operations in c code
+    }
+    else
+    {
+     int n8= n*8; //easier to read than <<3, same result
+     int mask = 255* pow(2, n8); // 2 raised to the power n8 is the same as shifting n8 bits
+     int cshift = c* pow(2, n8);
+     int z= (x & ~mask); //Due to the variablility of mask (depending on n8) this stays the same
     
-    return (z| cshift);
+    return (z| cshift); //Due to the variability on both of these ints this line also remains the same
+    }
   }
 
 
