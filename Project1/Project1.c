@@ -239,11 +239,11 @@ int ques8(int x) { //SIGN CHECK
     return y | z; //If x is negative this returns -1... if x is 0 this returns 0.... if x is positive this returns 1
 }
 
-/* This function is essentially a sign-check, where it returns 0 if the number is positive,
+/* This function is essentially a sign-check, where it returns 1 if the number is positive,
 -1 if it is negative, and 0 if it is 0 */
 int ans8(int x)
 {
-  if(x>0)
+  if(x>0) //simple sign checks 
     return 1;
   else if(x==0)
     return 0;
@@ -290,7 +290,7 @@ int ques10(int x) {
     /* using the ! operator with anything except 0 results in 0. So, if x is anything
     except 0, z becomes 0 */
 	int z = (!(x+x)); 
-    /* if x was 0, then y wil become 0, so this wil return 0. If x wasn't 0, then z becomes 0, 
+    /* if x was 0, then y wil become 0, so this will return 0. If x wasn't 0, then z becomes 0, 
     so this will still return 0. It always returns 0 regardless of the value of x */
     return y & z; 
 }
