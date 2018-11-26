@@ -8,7 +8,16 @@ void printList(struct hashmap* hm);
 int main(void) {
         char str[1000];
         int i;
-        struct hashmap *hm = hm_create(15);
+        int numBuckets;
+        int c;
+        printf("Enter the number of buckets: ");
+        /* handles error checking for non-integers */
+        while(scanf("%d", &numBuckets) != 1) {
+                /* gets the newline character because scanf does not */
+                while ((c = getchar()) != EOF && c != '\n');
+                printf("please enter a valid integer: ");
+        }
+        struct hashmap *hm = hm_create(numBuckets);
         /* loops through the 3 documents */
         for(i = 1; i < 4; i++) {
                 /* creates either D1, D2, or D3 based on the current loop */
@@ -30,9 +39,6 @@ int main(void) {
                         /* loops through all the words in the line */
                         while(token != NULL) {
                                 int len = strlen(token); /* gets the length of the token */
-                                //if(token == NULL) {
-                                //        continue;
-                                //}
                                 /* creates a new char array to copy the token into */
                                 char *word = (char *) malloc(len*sizeof(char));
                                 strcpy(word, token);

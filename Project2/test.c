@@ -4,11 +4,44 @@
 #include <string.h>
 
 void printList(struct hashmap* hm);
+void training(struct hashmap *hm);
+void read_query(char *query);
 
 int main(void) {
+        int numBuckets;
+        char query[100];
+        char c;
+        printf("Enter the number of buckets: ");
+        while(scanf("%d", &numBuckets) != 1) {
+                /* gets the newline character because scanf does not */
+                while ((c = getchar()) != EOF && c != '\n');
+                printf("please enter a valid integer: ");
+        }
+        /* reads in the newline character so we can successfully get input */
+        while ((c = getchar()) != EOF && c != '\n');
+        struct hashmap *hm = hm_create(numBuckets);
+        training(hm);
+        printf("Enter the search query: ");
+        // need to write loop for entering a string of any length
+        if(fgets(query, sizeof(query), stdin) != NULL) {
+                //printf("too small\n");
+                char newString[sizeof(query)*2];
+                strcat(newString, query);
+                
+        }
+        printf("%s", query);
+        read_query(query);
+        //printList(hm); /* print the list for viewing purposes */
+        //hm_remove(hm, "is", "D3.txt"); /* testing the remove function */
+        //printList(hm);
+        hm_destroy(hm); /* destroy the list */
+        //printList(hm);
+        return 0;
+}
+
+void training(struct hashmap *hm) {
         char str[1000];
         int i;
-        struct hashmap *hm = hm_create(15);
         /* loops through the 3 documents */
         for(i = 1; i < 4; i++) {
                 /* creates either D1, D2, or D3 based on the current loop */
@@ -53,12 +86,13 @@ int main(void) {
                         }
                 }
         }
-        printList(hm); /* print the list for viewing purposes */
-        //hm_remove(hm, "is", "D3.txt"); /* testing the remove function */
-        //printList(hm);
-        hm_destroy(hm); /* destroy the list */
-        //printList(hm);
-        return 0;
+}
+
+void read_query(char *query) {
+        //int len = strlen(query);
+        //query = malloc(len*sizeof(char));
+        // strtok to get words and arraylist to hold them ?
+
 }
 
 void printList(struct hashmap* hm) {
