@@ -151,6 +151,7 @@ void hm_destroy(struct hashmap* hm) {
             iter = temp;
         }
     }
+    free(hm->map);
     free(hm);
 }
 

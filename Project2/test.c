@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "hashmap.h"
+#include "array_list.h"
 #include <string.h>
 
 void printList(struct hashmap* hm);
 void training(struct hashmap *hm);
-void read_query(char *query);
+void read_query(char *query, struct array_list *list);
 
 int main(void) {
+        struct array_list *list = al_create(); /* used to hold the words in the search query */
         int numBuckets;
         char query[100];
         char c;
@@ -30,11 +32,12 @@ int main(void) {
                 
         }
         printf("%s", query);
-        read_query(query);
+        read_query(query, list);
         //printList(hm); /* print the list for viewing purposes */
         //hm_remove(hm, "is", "D3.txt"); /* testing the remove function */
         //printList(hm);
         hm_destroy(hm); /* destroy the list */
+        al_destroy(list);
         //printList(hm);
         return 0;
 }
@@ -88,11 +91,16 @@ void training(struct hashmap *hm) {
         }
 }
 
-void read_query(char *query) {
-        //int len = strlen(query);
-        //query = malloc(len*sizeof(char));
-        // strtok to get words and arraylist to hold them ?
-
+/* breaks the search query up into individual words and stores those words in
+ * an arraylist. An arraylist is used because the number of words in the search
+ * query is unspecified, so an arraylist will handle a search query of any length */
+void read_query(char *query, struct array_list *list) {
+        char *token = strtok(query, " \t\n");
+        while(token != NULL) {
+                al_add(list, token);
+                token = strtok(NULL, " \t\n");
+        }
+        al_print(list);
 }
 
 void printList(struct hashmap* hm) {
