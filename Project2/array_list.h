@@ -1,9 +1,10 @@
 #ifndef ARRAY_LIST_H
 #define ARRAY_LIST_H
 
-#define INITIAL_SIZE 10
+#define INITIAL_SIZE 3
 
 struct array_list {
+        //char *array[INITIAL_SIZE];
         char **array;
         int size;
         int capacity;

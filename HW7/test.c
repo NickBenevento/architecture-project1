@@ -64,6 +64,7 @@ int main(void) {
         //printList(hm);
         hm_destroy(hm); /* destroy the list */
         //printList(hm);
+        printf("num elements: %d\n", hm->num_elements);
         return 0;
 }
 

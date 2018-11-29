@@ -3,10 +3,13 @@
 #include "hashmap.h"
 #include "array_list.h"
 #include <string.h>
+#include <ctype.h>
 
 void printList(struct hashmap* hm);
 void training(struct hashmap *hm);
+char *format(char *string);
 void read_query(char *query, struct array_list *list);
+void rank(struct hashmap *hm, struct array_list *list);
 
 int main(void) {
         struct array_list *list = al_create(); /* used to hold the words in the search query */
@@ -20,15 +23,28 @@ int main(void) {
                 printf("please enter a valid integer: ");
         }
         /* reads in the newline character so we can successfully get input */
-        while ((c = getchar()) != EOF && c != '\n');
+        //while ((c = getchar()) != EOF && c != '\n');
+        getchar();
+        printf("Enter S to search, X to exit: ");
+        scanf("%c", &c);
+        
+        //while(c != 'S' || c != 's' || c != 'X' || c != 'x') {
+        //        printf("invalid input. please enter again: ");
+        //        scanf("%c", &c);
+        //        getchar();
+        //}
+        if(c == 'X' || c == 'x') {
+                return 0;
+        }
+        getchar();
         struct hashmap *hm = hm_create(numBuckets);
         training(hm);
         printf("Enter the search query: ");
         // need to write loop for entering a string of any length
         if(fgets(query, sizeof(query), stdin) != NULL) {
                 //printf("too small\n");
-                char newString[sizeof(query)*2];
-                strcat(newString, query);
+                //char newString[sizeof(query)*2];
+                //strcat(newString, query);
                 
         }
         printf("%s", query);
@@ -36,9 +52,10 @@ int main(void) {
         //printList(hm); /* print the list for viewing purposes */
         //hm_remove(hm, "is", "D3.txt"); /* testing the remove function */
         //printList(hm);
+        //printList(hm);
         hm_destroy(hm); /* destroy the list */
         al_destroy(list);
-        //printList(hm);
+        
         return 0;
 }
 
@@ -62,7 +79,7 @@ void training(struct hashmap *hm) {
                 }
                 /* loops through all the lines in the file */
                 while(fgets(str, 1000, fp) != NULL) {
-                        char *token = strtok(str, " \t\n");
+                        char *token = strtok(str, " \n\t");
                         /* loops through all the words in the line */
                         while(token != NULL) {
                                 int len = strlen(token); /* gets the length of the token */
@@ -70,8 +87,9 @@ void training(struct hashmap *hm) {
                                 //        continue;
                                 //}
                                 /* creates a new char array to copy the token into */
-                                char *word = (char *) malloc(len*sizeof(char));
+                                char *word = (char *) malloc((len+1)*sizeof(char));
                                 strcpy(word, token);
+                                word = format(word);
                                 /* does the same as above for the document name */
                                 char *document = (char *) malloc(7*sizeof(char));
                                 strcpy(document, filename);
@@ -85,10 +103,32 @@ void training(struct hashmap *hm) {
                                         num_count++; /* increase the count by 1 */
                                         hm_put(hm, word, document, num_count); /* put it back in the hashmap */
                                 }
-                                token = strtok(NULL, " \t\n");
+                                //free(word);
+                                //free(document);
+                                token = strtok(NULL, " \n\t");
                         }
                 }
+                fclose(fp);
         }
+}
+
+/* converts the letters to lowercase and removes any characters that aren't alphanumeric */
+char *format(char *string) {
+        int len = strlen(string);
+        len++; /* to include the end of line character */
+        char *newString = (char *) malloc((len)*sizeof(char)); /* make space for the formatted new string */
+        /* loops through all the characters of the string */ 
+        for(int i = 0; i < len; i++) {
+                /* if the character is alphanumeric, copy it over to the new string */
+                if(isalnum(string[i])) {
+                        newString[i] = tolower(string[i]);
+                }
+                else {
+                        newString[i] = string[i];
+                }
+        }
+        free(string); /* free the memeory used for the original string */
+        return newString;
 }
 
 /* breaks the search query up into individual words and stores those words in
@@ -97,10 +137,20 @@ void training(struct hashmap *hm) {
 void read_query(char *query, struct array_list *list) {
         char *token = strtok(query, " \t\n");
         while(token != NULL) {
-                al_add(list, token);
+                int len = strlen(token);
+                char *word = (char *) malloc((len+1)*sizeof(char));
+                strcpy(word, token);
+                al_add(list, word);
                 token = strtok(NULL, " \t\n");
         }
         al_print(list);
+}
+
+void rank(struct hashmap *hm, struct array_list *list) {
+        int i;
+        for(i = 0; i < hm->num_buckets; i++) {
+                printf("%s\n", list->array[i]);
+        }
 }
 
 void printList(struct hashmap* hm) {
@@ -115,6 +165,7 @@ void printList(struct hashmap* hm) {
                 while(currentNode != NULL) {
                         printf("   '%s' : %d , ", currentNode->word, currentNode->num_occurrences);
                         printf("%s\n", currentNode->document_id); 
+                        printf("%p\n", (void *)&currentNode->word);
                         currentNode = currentNode->next;
                 }
         }

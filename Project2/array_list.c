@@ -1,12 +1,17 @@
 #include "array_list.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct array_list* al_create(void){
     /* allocating memory for the list */
     struct array_list *new_list = malloc(sizeof(struct array_list));
     /* allocating memory for the array in the list */
-    new_list->array = malloc(5*sizeof(char **));
+    new_list->array = malloc(INITIAL_SIZE*sizeof(char *));
+    int i;
+    for(i = 0; i < INITIAL_SIZE; i++) {
+        new_list->array[i] = malloc(sizeof(char *));
+    }
     new_list->capacity = INITIAL_SIZE; /* capacity is the initial size */
     new_list->size = 0; /* starts with nothing in it */
     return new_list;
@@ -17,19 +22,36 @@ void al_add(struct array_list* list, char *word){
     list->size++; /* increases the size by 1 */
     /* if the array becomes full, copy the contents into a new array */
     if(list->size == list->capacity) {
-        printf("size = %d\n", list->size);
-        printf("%s\n", list->array[list->size-1]);
+        //printf("size = %d\n", list->size);
+        //printf("%s\n", list->array[list->size-1]);
         /* allocate memory for the new array, with 1.5* the capacity */
-        char **new_array = (char **) malloc(list->capacity*1.5*sizeof(char));
+        char **new_array = malloc(list->capacity*1.5*sizeof(char *));
+        //int newSize = (list->capacity)*1.5;
+        //char *new_array[newSize];
+        if(new_array == NULL) {
+            printf("failed\n");
+            return;
+        }
         /* loops through and copies all the elements to the new array */
         int i;
         for(i = 0; i < list->size; i++) {
+            //int len = strlen(list->array[i]);
+            //new_array[i] = (char *) malloc((len+1)*sizeof(char));
+            //strcpy(new_array[i], list->array[i]);
+            //free(list->array[i]);
+            //list->array[i] = NULL;
             new_array[i] = list->array[i];
+            //printf("new_array->i = %s\n", new_array[i]);
+            //free(list->array[i]);
         }
         free(list->array); /* free the memory used for the old array */
+        list->array = NULL;
+        //list->array = NULL;
         list->array = new_array; /* set the list's array to the new array */
+        //printf("list->array = %l", list->array);
         list->capacity = list->capacity*1.5; /* change the capacity to 1.5* the old capacity */
     }
+    //al_print(list);
 }
 
 char * al_get(struct array_list* list, int index){
@@ -68,9 +90,13 @@ void al_remove(struct array_list* list, int index){
 
 void al_print(struct array_list *list) {
     int i;
+    printf("printing list:\n");
     printf("[");
-    for(i = 0; i < al_size(list); i++) {
-        printf("%s, ", list->array[i]);
+    for(i = 0; i < list->size; i++) {
+        if(list->array[i] != NULL) {
+            printf("%s, ", list->array[i]);
+        }
+        
     }
     printf("\b\b]\n");
 }
@@ -81,6 +107,13 @@ int al_size(struct array_list* list){
 
 void al_destroy(struct array_list* list){
     /* frees the memory used for the structure */
+    int i;
+    printf("size: %d\n", list->size);
+    for(i = 0; i < list->size; i++) {
+        if(list->array[i] != NULL) {
+            free(list->array[i]);
+        }
+    }
     free(list->array);
     free(list);
 }

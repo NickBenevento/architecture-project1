@@ -8,6 +8,7 @@ struct hashmap* hm_create(int num_buckets) {
     /* allocates memory for the hashmap structure */
     struct hashmap* hm = malloc(sizeof(struct hashmap));
     hm->num_buckets = num_buckets;
+    hm->num_elements = 0;
     /* allocates memory for the array of buckets that hold the nodes */
     hm->map = (struct llnode**) malloc(num_buckets*sizeof(struct llnode));
     int i;
@@ -53,6 +54,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
         node->document_id = document_id;
         node->num_occurrences = num_occurrences;
         node->next = NULL;
+        hm->num_elements++;
         return;
     }
 
@@ -62,6 +64,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
         /* if the word/document pair is already found in the list, it is overriden with the new value */
         if(strcmp(node->word, word) == 0 && strcmp(node->document_id, document_id) == 0) {
             node->num_occurrences = num_occurrences;
+            hm->num_elements++;
             return;
         }
         node = node->next;
@@ -78,6 +81,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
     newNode->num_occurrences = num_occurrences;
     newNode->next = NULL;
     behind->next = newNode;
+    hm->num_elements++;
 }
 
 /* removes the key value pair in the hashmap */
@@ -97,10 +101,7 @@ void hm_remove(struct hashmap* hm, char* word, char* document_id) {
         if(strcmp(node->word, word) == 0 && strcmp(node->document_id, document_id) == 0) {
             /* could be 3 cases: the node is the head node, in the middle, or at the end */
             if(count == 0) {
-                
                 /* if it's the head, set the bucket equal to the next node */
-                
-                
                 if(node->next == NULL) {
                     node->next = malloc(sizeof(struct llnode));
                 }
@@ -151,22 +152,27 @@ void hm_destroy(struct hashmap* hm) {
             iter = temp;
         }
     }
+    free(hm->map);
     free(hm);
 }
 
 /* takes the given word and document ID and maps them to a bucket in the hashmap.
  * (easy way to do this is to sum the ASCII codes of all the characters and then
- * modulo by the number of buckets) */
+ * modulo by the number of buckets). NOTE: from the hw description and the project 
+ * description, I am pretty sure that the document_id is not supposed to be 
+ * added when doing the hashing. But to compile it has to be used, hence the for loop.
+ * If I am wrong, then the only change is to uncomment the 1 line in the for loop */
 int hash(struct hashmap* hm, char* word, char* document_id) {
     int wordLen = strlen(word);
     int documentLen = strlen(document_id);
     int i;
     int ascii_sum = 0;
     int bucket = -1;
-    /* loops through all the character in the word */
+    /* loops through all the characters in the word */
     for(i = 0; i < wordLen; i++) {
         ascii_sum += word[i]; /* adds their ascii value to sum */
     }
+    /* loop so that the document id is used and an error is not received. */
     for(i = 0; i < documentLen; i++) {
         //ascii_sum += document_id[i];
     }
