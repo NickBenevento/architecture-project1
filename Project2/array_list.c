@@ -22,12 +22,8 @@ void al_add(struct array_list* list, char *word){
     list->size++; /* increases the size by 1 */
     /* if the array becomes full, copy the contents into a new array */
     if(list->size == list->capacity) {
-        //printf("size = %d\n", list->size);
-        //printf("%s\n", list->array[list->size-1]);
         /* allocate memory for the new array, with 1.5* the capacity */
         char **new_array = malloc(list->capacity*1.5*sizeof(char *));
-        //int newSize = (list->capacity)*1.5;
-        //char *new_array[newSize];
         if(new_array == NULL) {
             printf("failed\n");
             return;
@@ -35,14 +31,7 @@ void al_add(struct array_list* list, char *word){
         /* loops through and copies all the elements to the new array */
         int i;
         for(i = 0; i < list->size; i++) {
-            //int len = strlen(list->array[i]);
-            //new_array[i] = (char *) malloc((len+1)*sizeof(char));
-            //strcpy(new_array[i], list->array[i]);
-            //free(list->array[i]);
-            //list->array[i] = NULL;
             new_array[i] = list->array[i];
-            //printf("new_array->i = %s\n", new_array[i]);
-            //free(list->array[i]);
         }
         free(list->array); /* free the memory used for the old array */
         list->array = NULL;
@@ -51,7 +40,6 @@ void al_add(struct array_list* list, char *word){
         //printf("list->array = %l", list->array);
         list->capacity = list->capacity*1.5; /* change the capacity to 1.5* the old capacity */
     }
-    //al_print(list);
 }
 
 char * al_get(struct array_list* list, int index){
@@ -96,7 +84,6 @@ void al_print(struct array_list *list) {
         if(list->array[i] != NULL) {
             printf("%s, ", list->array[i]);
         }
-        
     }
     printf("\b\b]\n");
 }

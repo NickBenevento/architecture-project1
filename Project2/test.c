@@ -8,14 +8,19 @@
 void printList(struct hashmap* hm);
 void training(struct hashmap *hm);
 char *format(char *string);
-void read_query(char *query, struct array_list *list);
-void rank(struct hashmap *hm, struct array_list *list);
+char *read_query(void);
+void rank(struct hashmap *hm, char *query);
+void stop_word(struct hashmap *hm);
+
+int numDocuments;
 
 int main(void) {
-        struct array_list *list = al_create(); /* used to hold the words in the search query */
+        //struct array_list *list = al_create(); /* used to hold the words in the search query */
         int numBuckets;
-        char query[100];
+        //char query[100];
+        char *query;
         char c;
+        numDocuments = 3;
         printf("Enter the number of buckets: ");
         while(scanf("%d", &numBuckets) != 1) {
                 /* gets the newline character because scanf does not */
@@ -23,38 +28,31 @@ int main(void) {
                 printf("please enter a valid integer: ");
         }
         /* reads in the newline character so we can successfully get input */
-        //while ((c = getchar()) != EOF && c != '\n');
+        char *valid = "SsXx";
         getchar();
         printf("Enter S to search, X to exit: ");
         scanf("%c", &c);
-        
-        //while(c != 'S' || c != 's' || c != 'X' || c != 'x') {
-        //        printf("invalid input. please enter again: ");
-        //        scanf("%c", &c);
-        //        getchar();
-        //}
+        /* get a new char while the entered character wasn't a valid input */
+        while(strchr(valid, c) == NULL) {
+            printf("Enter a valid input please: ");
+            scanf("%c", &c);    
+        }
         if(c == 'X' || c == 'x') {
                 return 0;
         }
-        getchar();
+        getchar(); /* a buffer to get the newline character */
+
         struct hashmap *hm = hm_create(numBuckets);
         training(hm);
-        printf("Enter the search query: ");
-        // need to write loop for entering a string of any length
-        if(fgets(query, sizeof(query), stdin) != NULL) {
-                //printf("too small\n");
-                //char newString[sizeof(query)*2];
-                //strcat(newString, query);
-                
-        }
-        printf("%s", query);
-        read_query(query, list);
+        printList(hm);
+        //stop_word(hm);
+        query = read_query();
+        rank(hm, query);
+        //read_query(query, list);
         //printList(hm); /* print the list for viewing purposes */
         //hm_remove(hm, "is", "D3.txt"); /* testing the remove function */
-        //printList(hm);
-        //printList(hm);
         hm_destroy(hm); /* destroy the list */
-        al_destroy(list);
+        //al_destroy(list);
         
         return 0;
 }
@@ -112,6 +110,14 @@ void training(struct hashmap *hm) {
         }
 }
 
+void stop_word(struct hashmap *hm) {
+        int i;
+        for(i = 0; i < hm->num_buckets; i++) {
+                char *word = hm->map[i]->word;
+                printf("%s\n", word);
+        }
+}
+
 /* converts the letters to lowercase and removes any characters that aren't alphanumeric */
 char *format(char *string) {
         int len = strlen(string);
@@ -131,25 +137,40 @@ char *format(char *string) {
         return newString;
 }
 
-/* breaks the search query up into individual words and stores those words in
- * an arraylist. An arraylist is used because the number of words in the search
- * query is unspecified, so an arraylist will handle a search query of any length */
-void read_query(char *query, struct array_list *list) {
-        char *token = strtok(query, " \t\n");
-        while(token != NULL) {
-                int len = strlen(token);
-                char *word = (char *) malloc((len+1)*sizeof(char));
-                strcpy(word, token);
-                al_add(list, word);
-                token = strtok(NULL, " \t\n");
+
+char *read_query(void) {
+        printf("Enter the search query: ");
+        char *query = malloc(10*sizeof(char));
+        
+        //char 
+        if(fgets(query, sizeof(query), stdin) != NULL) {
+                //printf("too small\n");
+                //char newString[sizeof(query)*2];
+                //strcat(newString, query);
+                
         }
-        al_print(list);
+        printf("%s", query);
+        return query;
+        //char *token = strtok(query, " \t\n");
+        //while(token != NULL) {
+        //        int len = strlen(token);
+        //        char *word = (char *) malloc((len+1)*sizeof(char));
+        //        strcpy(word, token);
+        //        al_add(list, word);
+        //        token = strtok(NULL, " \t\n");
+        //}
+        //al_print(list);
 }
 
-void rank(struct hashmap *hm, struct array_list *list) {
+void rank(struct hashmap *hm, char *query) {
         int i;
+        char *token = strtok(query, " \t\n");
+        while(token != NULL) {
+                
+                token = strtok(NULL, " \t\n");
+        }
         for(i = 0; i < hm->num_buckets; i++) {
-                printf("%s\n", list->array[i]);
+                //printf("%s\n", list->array[i]);
         }
 }
 
@@ -163,9 +184,12 @@ void printList(struct hashmap* hm) {
                 }
                 /* prints out all the elements in the list at the current bucket */
                 while(currentNode != NULL) {
-                        printf("   '%s' : %d , ", currentNode->word, currentNode->num_occurrences);
-                        printf("%s\n", currentNode->document_id); 
-                        printf("%p\n", (void *)&currentNode->word);
+                        printf("   '%s'\n", currentNode->word);
+                        struct lldoc* iter = currentNode->docptr;
+                        while(iter != NULL) {
+                                printf("\t%s: %d\n", iter->document_id, iter->num_occurrences);
+                                iter = iter->doc_next;
+                        }
                         currentNode = currentNode->next;
                 }
         }
