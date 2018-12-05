@@ -24,7 +24,8 @@ int main(void) {
         printf("Enter the number of buckets: ");
         while(scanf("%d", &numBuckets) != 1) {
                 /* gets the newline character because scanf does not */
-                while ((c = getchar()) != EOF && c != '\n');
+                //while ((c = getchar()) != EOF && c != '\n');
+                getchar();
                 printf("please enter a valid integer: ");
         }
         /* reads in the newline character so we can successfully get input */
@@ -44,13 +45,13 @@ int main(void) {
 
         struct hashmap *hm = hm_create(numBuckets);
         training(hm);
+        //printList(hm);
+        //hm_remove(hm, "computer");
+        stop_word(hm);
         printList(hm);
-        //stop_word(hm);
         query = read_query();
         rank(hm, query);
         //read_query(query, list);
-        //printList(hm); /* print the list for viewing purposes */
-        //hm_remove(hm, "is", "D3.txt"); /* testing the remove function */
         hm_destroy(hm); /* destroy the list */
         //al_destroy(list);
         
@@ -113,8 +114,18 @@ void training(struct hashmap *hm) {
 void stop_word(struct hashmap *hm) {
         int i;
         for(i = 0; i < hm->num_buckets; i++) {
-                char *word = hm->map[i]->word;
-                printf("%s\n", word);
+                struct llnode *node = hm->map[i];
+                if(node->word == NULL) {
+                        continue; /* if there's nothing in the bucket, continute to the next bucket */
+                }
+                while(node != NULL) {
+                        printf("word: %s\n", node->word);
+                        struct llnode *temp = node->next;
+                        if(node->df_score == numDocuments) {
+                                hm_remove(hm, node->word);
+                        }
+                        node = temp;
+                }
         }
 }
 
@@ -184,7 +195,7 @@ void printList(struct hashmap* hm) {
                 }
                 /* prints out all the elements in the list at the current bucket */
                 while(currentNode != NULL) {
-                        printf("   '%s'\n", currentNode->word);
+                        printf("   '%s' : df = %d\n", currentNode->word, currentNode->df_score);
                         struct lldoc* iter = currentNode->docptr;
                         while(iter != NULL) {
                                 printf("\t%s: %d\n", iter->document_id, iter->num_occurrences);

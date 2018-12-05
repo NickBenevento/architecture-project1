@@ -5,7 +5,7 @@ struct llnode {
         char* word;
         //char* document_id;
         //int num_occurrences;
-        double df_score;
+        int df_score;
         struct llnode* next;
         struct lldoc* docptr;
 };

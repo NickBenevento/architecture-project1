@@ -63,6 +63,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
     if(node->word == NULL) {
         node->docptr = malloc(sizeof(struct lldoc));
         node->word = word;
+        node->df_score = 1;
         node->docptr->document_id = document_id;
         node->docptr->num_occurrences = num_occurrences;
         node->docptr->doc_next = NULL;
@@ -88,6 +89,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
             }
             /* the word was in the list but not the document */
             struct lldoc* newDoc = malloc(sizeof(struct lldoc));
+            node->df_score++;
             newDoc->document_id = document_id;
             newDoc->num_occurrences = 1;
             newDoc->doc_next = NULL;
@@ -101,6 +103,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
     struct llnode *newNode = malloc(sizeof(struct llnode));
     newNode->docptr = malloc(sizeof(struct lldoc));
     newNode->word = word;
+    newNode->df_score = 1;
     newNode->docptr->document_id = document_id;
     newNode->docptr->num_occurrences = num_occurrences;
     newNode->docptr->doc_next = NULL;
@@ -127,11 +130,16 @@ void hm_remove(struct hashmap* hm, char* word) {
             /* could be 3 cases: the node is the head node, in the middle, or at the end */
             if(count == 0) {
                 /* if it's the head, set the bucket equal to the next node */
-                if(node->next == NULL) {
-                    node->next = malloc(sizeof(struct llnode));
-                }
-                hm->map[index] = node->next;
-                node->next = NULL;
+                //if(node->next == NULL) {
+                //    node->next = malloc(sizeof(struct llnode));
+                //}
+                //hm->map[index] = node->next;
+                //node->next = NULL;
+                //node = NULL;
+                free(node->word);
+                free(node);
+                node = NULL;
+                return;
             }
             /* if the node is inbetween 2 other nodes */
             else if(node->next != NULL) {
