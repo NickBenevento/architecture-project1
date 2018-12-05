@@ -4,6 +4,7 @@
 #include "array_list.h"
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 void printList(struct hashmap* hm);
 void training(struct hashmap *hm);
@@ -12,6 +13,13 @@ char *read_query(void);
 void rank(struct hashmap *hm, char *query);
 void stop_word(struct hashmap *hm);
 
+/* TODO LIST:
+ * fix bug with more than 1 search word
+ * clean code up -- get rid of unecessary methods
+ * add ability to work for any number of documents (Extra Credit)
+ * check after each malloc
+ */
+
 int main(void) {
         int numBuckets;
         char *query;
@@ -19,26 +27,25 @@ int main(void) {
         int num_documents = 3;
         printf("Enter the number of buckets: ");
         while(scanf("%d", &numBuckets) != 1) {
-                /* gets the newline character because scanf does not */
-                //while ((c = getchar()) != EOF && c != '\n');
-                getchar();
+                while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
+                //fflush(stdin);
                 printf("please enter a valid integer: ");
         }
         /* reads in the newline character so we can successfully get input */
         char *valid = "SsXx";
-        getchar();
+        while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
         printf("Enter S to search, X to exit: ");
         scanf("%c", &c);
         /* get a new char while the entered character wasn't a valid input */
         while(strchr(valid, c) == NULL) {
             printf("Enter a valid input please: ");
-            scanf("%c", &c);    
+            c = fgetc(stdin);  
+            while ((c = getchar()) != '\n');
         }
         if(c == 'X' || c == 'x') {
                 return 0;
         }
-        getchar(); /* a buffer to get the newline character */
-
+        while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
         struct hashmap *hm = hm_create(numBuckets, num_documents);
         training(hm);
         stop_word(hm);
@@ -46,7 +53,7 @@ int main(void) {
         query = read_query();
         rank(hm, query);
         hm_destroy(hm); /* destroy the list */
-        
+        free(query);
         return 0;
 }
 
@@ -74,9 +81,6 @@ void training(struct hashmap *hm) {
                         /* loops through all the words in the line */
                         while(token != NULL) {
                                 int len = strlen(token); /* gets the length of the token */
-                                //if(token == NULL) {
-                                //        continue;
-                                //}
                                 /* creates a new char array to copy the token into */
                                 char *word = (char *) malloc((len+1)*sizeof(char));
                                 strcpy(word, token);
@@ -121,42 +125,41 @@ void stop_word(struct hashmap *hm) {
 
 /* converts the letters to lowercase and removes any characters that aren't alphanumeric */
 char *format(char *string) {
-        int len = strlen(string);
-        len++; /* to include the end of line character */
-        char *newString = (char *) malloc((len)*sizeof(char)); /* make space for the formatted new string */
+        int len = strlen(string) +1;
         /* loops through all the characters of the string */ 
         for(int i = 0; i < len; i++) {
-                /* if the character is alphanumeric, copy it over to the new string */
+                /* if the character is alphanumeric, make it lowercase */
                 if(isalnum(string[i])) {
-                        newString[i] = tolower(string[i]);
-                }
-                else {
-                        newString[i] = string[i];
+                        string[i] = tolower(string[i]);
                 }
         }
-        free(string); /* free the memeory used for the original string */
-        return newString;
+        return string;
 }
 
 
 char *read_query(void) {
         printf("Enter the search query: ");
-        char *query = malloc(15*sizeof(char));
-        //int len = strlen(query) + 1;
-
-        /* need to get string of any length */
-        if(fgets(query, 15, stdin) != NULL) {
-                //printf("too small\n");
-                //char newString[sizeof(query)*2];
-                //strcat(newString, query);
-                
+        int len = 5;
+        int size = 0;
+        char *query = malloc(len*sizeof(char)); /* start with a string of length 5 */
+        char c;
+        while( (c = fgetc(stdin)) != '\n') {
+                c = tolower(c); /*converts char to lowercase */
+                query[size] = c; /* puts the character in the string */
+                size++;
+                /* if the size of the string is equal to the length, increase the length and reallocate memory */
+                if( size == len) {
+                        len += 1;
+                        query = realloc(query, sizeof(char)*len);
+                }
         }
-        printf("%s", query);
+        query[size] = '\0'; /* add the terminating character to the end */
+        printf("query: %s\n", query);
         return query;
 }
 
 void rank(struct hashmap *hm, char *query) {
-        //int i;
+        double numerator = (double) hm->num_documents;
         double d1_score = 0;
         double d2_score = 0;
         double d3_score = 0;
@@ -164,11 +167,15 @@ void rank(struct hashmap *hm, char *query) {
         while(token != NULL) {
                 struct llnode *node = hm_get_word(hm, token);
                 if(node == NULL) {
+                        printf("the word '%s' was not found in any documents.\n", token);
+                        token = strtok(NULL, " \t\n");
                         continue;
                 }
-                if(hm_get_doc_freq(hm, token) == -1) {
-                        continue;
-                }
+                double x = numerator / (double) node->df_score;
+                double inverse_df = log10(x);
+                printf("word: %s , idf: %f\n", node->word, inverse_df);
+                node->idf = inverse_df;
+
                 printf("node->score: %f\n", node->idf);
                 struct lldoc *iter = node->docptr;
                 int count = 0;

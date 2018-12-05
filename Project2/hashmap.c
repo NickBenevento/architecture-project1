@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 /* allocates memory for a new hashmap */
 struct hashmap* hm_create(int num_buckets, int num_documents) {
@@ -71,37 +70,13 @@ struct llnode* hm_get_word(struct hashmap* hm, char *word) {
     while(node != NULL) {
         /* check if the words and the document are the same */
         if(strcmp(node->word, word) == 0) {
+            //free(word);
             return node;
         }
         node = node->next;
     }
     return NULL;
 }
-
-double hm_get_doc_freq(struct hashmap* hm, char *word) {
-    int index = hash(hm, word);
-    struct llnode *node = hm->map[index];
-    /* if the word is null, return -1 because the word isn't there */
-    if (node->word == NULL) {
-        return -1;
-    }
-    /* loops through the linked list at the bucket */
-    while(node != NULL) {
-        /* check if the words and the document are the same */
-        if(strcmp(node->word, word) == 0) {
-            double x = (double) hm->num_documents / (double) node->df_score;
-            double inverse_df = log10(x);
-            printf("word: %s , idf: %f\n", node->word, inverse_df);
-            node->idf = inverse_df;
-            return inverse_df;
-        }
-        node = node->next;
-    }
-    return -1;
-}
-
-//make rank function? takes in a string as a parameter and ranks each document for that
-// word if it exists
 
 /* puts the key value pair into the hashmap that is passed in. If the word and 
  * document ID combination already exist, its value is overriden with the new one */
@@ -131,6 +106,9 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
             /* need to loop through the document list for the word */
             while(iter != NULL) {
                 if(strcmp(iter->document_id, document_id) == 0) {
+                    /* free the word/document passed in because a pair already exists */
+                    free(document_id);
+                    free(word);
                     iter->num_occurrences++; /* if they're both the same, increase the number of occurances */
                     return;
                 }
@@ -139,6 +117,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
             }
             /* the word was in the list but not the document */
             struct lldoc* newDoc = malloc(sizeof(struct lldoc));
+            free(word); /* free the memory used for the word that was passed in because we don't need to use it */
             node->df_score++;
             newDoc->document_id = document_id;
             newDoc->num_occurrences = 1;
