@@ -12,15 +12,11 @@ char *read_query(void);
 void rank(struct hashmap *hm, char *query);
 void stop_word(struct hashmap *hm);
 
-int numDocuments;
-
 int main(void) {
-        //struct array_list *list = al_create(); /* used to hold the words in the search query */
         int numBuckets;
-        //char query[100];
         char *query;
         char c;
-        numDocuments = 3;
+        int num_documents = 3;
         printf("Enter the number of buckets: ");
         while(scanf("%d", &numBuckets) != 1) {
                 /* gets the newline character because scanf does not */
@@ -43,17 +39,13 @@ int main(void) {
         }
         getchar(); /* a buffer to get the newline character */
 
-        struct hashmap *hm = hm_create(numBuckets);
+        struct hashmap *hm = hm_create(numBuckets, num_documents);
         training(hm);
-        //printList(hm);
-        hm_remove(hm, "computer");
-        //stop_word(hm);
+        stop_word(hm);
         printList(hm);
         query = read_query();
         rank(hm, query);
-        //read_query(query, list);
         hm_destroy(hm); /* destroy the list */
-        //al_destroy(list);
         
         return 0;
 }
@@ -93,7 +85,7 @@ void training(struct hashmap *hm) {
                                 char *document = (char *) malloc(7*sizeof(char));
                                 strcpy(document, filename);
                                 /* gets the number of occurances of the word + document pair */
-                                int num_count = hm_get(hm, word, document);
+                                int num_count = hm_get(hm, word, document, 1);
                                 /* if the word does not exist in the hashmap, add it to the map */
                                 if(num_count == -1) {
                                         hm_put(hm, word, document, 1);
@@ -102,8 +94,6 @@ void training(struct hashmap *hm) {
                                         num_count++; /* increase the count by 1 */
                                         hm_put(hm, word, document, num_count); /* put it back in the hashmap */
                                 }
-                                //free(word);
-                                //free(document);
                                 token = strtok(NULL, " \n\t");
                         }
                 }
@@ -119,9 +109,9 @@ void stop_word(struct hashmap *hm) {
                         continue; /* if there's nothing in the bucket, continute to the next bucket */
                 }
                 while(node != NULL) {
-                        printf("word: %s\n", node->word);
+                        //printf("word: %s\n", node->word);
                         struct llnode *temp = node->next;
-                        if(node->df_score == numDocuments) {
+                        if(node->df_score == hm->num_documents) {
                                 hm_remove(hm, node->word);
                         }
                         node = temp;
@@ -151,10 +141,11 @@ char *format(char *string) {
 
 char *read_query(void) {
         printf("Enter the search query: ");
-        char *query = malloc(10*sizeof(char));
-        
-        //char 
-        if(fgets(query, sizeof(query), stdin) != NULL) {
+        char *query = malloc(15*sizeof(char));
+        //int len = strlen(query) + 1;
+
+        /* need to get string of any length */
+        if(fgets(query, 15, stdin) != NULL) {
                 //printf("too small\n");
                 //char newString[sizeof(query)*2];
                 //strcat(newString, query);
@@ -162,27 +153,45 @@ char *read_query(void) {
         }
         printf("%s", query);
         return query;
-        //char *token = strtok(query, " \t\n");
-        //while(token != NULL) {
-        //        int len = strlen(token);
-        //        char *word = (char *) malloc((len+1)*sizeof(char));
-        //        strcpy(word, token);
-        //        al_add(list, word);
-        //        token = strtok(NULL, " \t\n");
-        //}
-        //al_print(list);
 }
 
 void rank(struct hashmap *hm, char *query) {
-        int i;
+        //int i;
+        double d1_score = 0;
+        double d2_score = 0;
+        double d3_score = 0;
         char *token = strtok(query, " \t\n");
         while(token != NULL) {
-                
+                struct llnode *node = hm_get_word(hm, token);
+                if(node == NULL) {
+                        continue;
+                }
+                if(hm_get_doc_freq(hm, token) == -1) {
+                        continue;
+                }
+                printf("node->score: %f\n", node->idf);
+                struct lldoc *iter = node->docptr;
+                int count = 0;
+                while(iter != NULL) {
+                        if(count == 0) {
+                                d1_score += node->idf*iter->num_occurrences;
+                        }
+                        else if(count == 1) {
+                                d2_score += node->idf*iter->num_occurrences;
+                        }
+                        else if(count == 2) {
+                                d3_score += node->idf*iter->num_occurrences;
+                        }
+                        printf("iter->doc: %s\n", iter->document_id);
+                        count++;
+                        iter = iter->doc_next;
+                }
+                //hm_get_doc_freq(hm, token);
                 token = strtok(NULL, " \t\n");
         }
-        for(i = 0; i < hm->num_buckets; i++) {
-                //printf("%s\n", list->array[i]);
-        }
+        printf("d1_score: %f\n", d1_score);
+        printf("d2_score: %f\n", d2_score);
+        printf("d3_score: %f\n", d3_score);
 }
 
 void printList(struct hashmap* hm) {
