@@ -46,8 +46,8 @@ int main(void) {
         struct hashmap *hm = hm_create(numBuckets);
         training(hm);
         //printList(hm);
-        //hm_remove(hm, "computer");
-        stop_word(hm);
+        hm_remove(hm, "computer");
+        //stop_word(hm);
         printList(hm);
         query = read_query();
         rank(hm, query);

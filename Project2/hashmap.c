@@ -129,17 +129,16 @@ void hm_remove(struct hashmap* hm, char* word) {
         if(strcmp(node->word, word) == 0) {
             /* could be 3 cases: the node is the head node, in the middle, or at the end */
             if(count == 0) {
-                /* if it's the head, set the bucket equal to the next node */
-                //if(node->next == NULL) {
-                //    node->next = malloc(sizeof(struct llnode));
-                //}
-                //hm->map[index] = node->next;
+                if(node->next == NULL) {
+                    free(node->word);
+                    free(node);
+                    node = NULL;
+                    return;
+                }
+                hm->map[index] = node->next;
                 //node->next = NULL;
                 //node = NULL;
-                free(node->word);
-                free(node);
-                node = NULL;
-                return;
+                
             }
             /* if the node is inbetween 2 other nodes */
             else if(node->next != NULL) {
@@ -161,6 +160,7 @@ void hm_remove(struct hashmap* hm, char* word) {
             }
             free(node->word);
             free(node);
+            node = NULL;
             return;
         }
         behind = node;
