@@ -13,6 +13,7 @@ void doc_add(struct docnode* head, char *document);
 void doc_destroy(struct docnode* head);
 void doc_print_order(struct docnode* head);
 void doc_print(struct docnode* head);
+void doc_reset(struct docnode* head);
 void doc_delete(struct docnode* head);
 
 #endif

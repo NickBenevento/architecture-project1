@@ -8,53 +8,72 @@
 #include <glob.h>
 
 void printList(struct hashmap* hm);
-void training(struct hashmap *hm, struct docnode* doc_list);
+int training(struct hashmap *hm, struct docnode* doc_list);
 char *format(char *string);
 char *read_query(void);
 void rank(struct hashmap *hm, struct docnode* doc_list, char *query);
 void stop_word(struct hashmap *hm);
 
 int main(void) {
-        struct docnode* doc_list = doc_create();
         int numBuckets;
-        char *query;
         char c;
         printf("Enter the number of buckets: ");
         while(scanf("%d", &numBuckets) != 1) {
                 while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
-                //fflush(stdin);
                 printf("please enter a valid integer: ");
         }
-        /* reads in the newline character so we can successfully get input */
-        char *valid = "SsXx";
+        struct hashmap *hm = hm_create(numBuckets, 0);
+        /* clears the buffer */
         while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
+
         printf("Enter S to search, X to exit: ");
-        scanf("%c", &c);
+        char *valid = "SsXx";
         /* get a new char while the entered character wasn't a valid input */
-        while(strchr(valid, c) == NULL) {
-            printf("Enter a valid input please: ");
-            c = fgetc(stdin);  
-            while ((c = getchar()) != '\n');
+        while(strchr(valid, (c = fgetc(stdin))) == NULL) {
+                printf("Enter a valid input please: ");
+                char buf;
+                /* gets the characters in the buffer */
+                while ((buf = getchar()) != '\n');
+                //getchar();
         }
+        /* if the user wants to exit */
         if(c == 'X' || c == 'x') {
+                hm_destroy(hm);
                 return 0;
         }
         while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
 
-        struct hashmap *hm = hm_create(numBuckets, 0);
-        training(hm, doc_list);
+        struct docnode* doc_list = doc_create();
+        if(training(hm, doc_list) == -1) {
+                        printf("error reading the search string\n");
+                        doc_delete(doc_list);
+                        hm_destroy(hm);
+                        return 0;
+        }
         stop_word(hm);
-        printList(hm);
-        printf("Enter the search query: ");
-        query = read_query();
-        rank(hm, doc_list, query);
-        hm_destroy(hm); /* destroy the list */
-        free(query);
+        /* loop to keep getting search queries */
+        while(1) {
+                //printList(hm); /* prints the hashmap for veiwing purposes */
+                char *query;
+                printf("Enter the search query (or # to exit) :");
+                query = read_query();
+                /* breaks if the user enters '#' */
+                if(query[0] == '#') {
+                        free(query);
+                        break;
+                }
+                rank(hm, doc_list, query);
+                query = NULL;
+                free(query);
+                doc_reset(doc_list); /* resets the scores for the documents */
+        }
+        /* free the memory */
         doc_delete(doc_list);
+        hm_destroy(hm); /* destroy the list */
         return 0;
 }
 
-void training(struct hashmap *hm, struct docnode* doc_list) {
+int training(struct hashmap *hm, struct docnode* doc_list) {
         printf("enter the search string: ");
         char *search_string = read_query(); /* uses the readquery function to get the search string */
         glob_t result;
@@ -64,7 +83,8 @@ void training(struct hashmap *hm, struct docnode* doc_list) {
         /* glob returns 0 on success, so if it wasn't 0, then there is a problem */
         if(retval != 0) {
                 printf("error. could not open the files in the directory with the search string\n");
-                return;
+                free(search_string);
+                return -1;
         }
         char **file; /* an array of strings that hold the filenames */
         /* loops through all the filenames that were read by glob */
@@ -80,7 +100,7 @@ void training(struct hashmap *hm, struct docnode* doc_list) {
                 doc_len++;
                 char *document_copy = (char *) malloc(doc_len*sizeof(char));
                 if(!document_copy) {
-                        return;
+                        return -1;
                 }
                 strcpy(document_copy, *file);
                 /* add the document to the document list */
@@ -95,14 +115,14 @@ void training(struct hashmap *hm, struct docnode* doc_list) {
                                 /* creates a new char array to copy the token into */
                                 char *word = (char *) malloc((len+1)*sizeof(char));
                                 if(!word) {
-                                        return;
+                                        return -1;
                                 }
                                 strcpy(word, token);
                                 word = format(word);
                                 /* does the same as above for the document name */
                                 char *document = (char *) malloc(doc_len*sizeof(char));
                                 if(!document) {
-                                        return;
+                                        return -1;
                                 }
                                 strcpy(document, *file);
                                 /* gets the number of occurances of the word + document pair */
@@ -122,6 +142,7 @@ void training(struct hashmap *hm, struct docnode* doc_list) {
         }
         free(search_string); /* free the search string */
         globfree(&result); /* free the object used for glob */
+        return 0;
 }
 
 /* removes any stop words (words that appear in all the documents) */
@@ -217,7 +238,6 @@ void rank(struct hashmap *hm, struct docnode* doc_list, char *query) {
                         while(strcmp(doc_iter->document, iter->document_id) != 0) {
                                 doc_iter = doc_iter->next;
                         }
-                        printf("iter->doc: %s, adding %f\n", doc_iter->document, node->idf*iter->num_occurrences);
                         doc_iter->score += node->idf*iter->num_occurrences; /* adds to that document score */
                         
                         iter = iter->doc_next;
