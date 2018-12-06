@@ -10,8 +10,8 @@ SRC_DIR = ./
 OBJ_DIR = ./
 
 # file lists
-CFILES = hashmap.c test.c array_list.c
-OBJS = hashmap.o test.o array_list.o
+CFILES = hashmap.c test.c doclist.c
+OBJS = hashmap.o test.o doclist.o
 
 # binary
 BIN = test

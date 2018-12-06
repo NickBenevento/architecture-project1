@@ -4,7 +4,6 @@
 #define INITIAL_SIZE 3
 
 struct array_list {
-        //char *array[INITIAL_SIZE];
         char **array;
         int size;
         int capacity;

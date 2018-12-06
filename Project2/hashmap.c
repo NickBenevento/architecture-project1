@@ -7,18 +7,26 @@
 struct hashmap* hm_create(int num_buckets, int num_documents) {
     /* allocates memory for the hashmap structure */
     struct hashmap* hm = malloc(sizeof(struct hashmap));
+    if(!hm) {
+        return NULL;
+    }
     hm->num_buckets = num_buckets;
     hm->num_elements = 0;
     hm->num_documents = num_documents;
     /* allocates memory for the array of buckets that hold the nodes */
     hm->map = (struct llnode**) malloc(num_buckets*sizeof(struct llnode));
+    if(!hm->map) {
+        return NULL;
+    }
     int i;
     /* loops through the number of buckets and allocates memory for the nodes in the buckets */
     for(i = 0; i < num_buckets; i++) {
         hm->map[i] =  malloc(sizeof(struct llnode));
+        if(!hm->map[i]) {
+            return NULL;
+        }
         hm->map[i]->next = NULL;
         hm->map[i]->docptr = NULL;
-        //hm->map[i]->word = (char *)malloc(sizeof(char));
         hm->map[i]->word = NULL;
     }
     return hm;
@@ -27,7 +35,7 @@ struct hashmap* hm_create(int num_buckets, int num_documents) {
 /* returns the value associates with the key that is passed in 
  * within the hashmap that is passed in. If it is not found, -1
  * is returned */
-int hm_get(struct hashmap* hm, char* word, char* document_id, int compare_docID_or_nah) {
+int hm_get(struct hashmap* hm, char* word, char* document_id) {
     int index = hash(hm, word);
     struct llnode *node = hm->map[index];
     /* if the word is null, return -1 because the word isn't there */
@@ -36,13 +44,9 @@ int hm_get(struct hashmap* hm, char* word, char* document_id, int compare_docID_
     }
     /* loops through the linked list at the bucket */
     while(node != NULL) {
-        /* check if the words and the document are the same */
+        /* check if the words are the same */
         if(strcmp(node->word, word) == 0) {
-            /* if we don't want to compare the document id, return true */
-            if(!compare_docID_or_nah) {
-                return 1;
-            }
-            /* otherwise, search through the word's doc list to try to find the docuement */
+            /* Search through the word's doc list to try to find the docuement */
             struct lldoc* iter = node->docptr;
             while(iter != NULL) {
                 if(strcmp(iter->document_id, document_id) == 0) {
@@ -70,7 +74,6 @@ struct llnode* hm_get_word(struct hashmap* hm, char *word) {
     while(node != NULL) {
         /* check if the words and the document are the same */
         if(strcmp(node->word, word) == 0) {
-            //free(word);
             return node;
         }
         node = node->next;
@@ -87,8 +90,11 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
     /* if there is no word in the bucket, a new one is put there */
     if(node->word == NULL) {
         node->docptr = malloc(sizeof(struct lldoc));
+        if(!node->docptr) {
+            return;
+        }
         node->word = word;
-        node->df_score = 1;
+        node->df_score = 1; /* appears in 1 document so far, so df is 1 */
         node->docptr->document_id = document_id;
         node->docptr->num_occurrences = num_occurrences;
         node->docptr->doc_next = NULL;
@@ -117,6 +123,9 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
             }
             /* the word was in the list but not the document */
             struct lldoc* newDoc = malloc(sizeof(struct lldoc));
+            if(!newDoc) {
+                return;
+            }
             free(word); /* free the memory used for the word that was passed in because we don't need to use it */
             node->df_score++;
             newDoc->document_id = document_id;
@@ -130,7 +139,13 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
     }
     /* if the word was not found in the list, it is added at the end */
     struct llnode *newNode = malloc(sizeof(struct llnode));
+    if(!newNode) {
+        return;
+    }
     newNode->docptr = malloc(sizeof(struct lldoc));
+    if(!newNode->docptr) {
+        return;
+    }
     newNode->word = word;
     newNode->df_score = 1;
     newNode->docptr->document_id = document_id;
@@ -154,16 +169,19 @@ void hm_remove(struct hashmap* hm, char* word) {
     struct llnode *behind = node;
     /* loops through the linked list to search for the element */
     while(node != NULL) {
-        /* if the element was found, free it */
+        /* if the element was found, free it and the doc list */
         if(strcmp(node->word, word) == 0) {
             /* could be 3 cases: the node is the head node, in the middle, or at the end */
             if(count == 0) {
+                /* if the node is the head node and the only node in the bucket */
                 if(node->next == NULL) {
                     free(node->word);
                     free(node);
                     node = NULL;
+                    hm->num_elements--;
                     return;
                 }
+                /* the bucket is set to the next node */
                 hm->map[index] = node->next;
             }
             /* if the node is inbetween 2 other nodes */
@@ -179,14 +197,17 @@ void hm_remove(struct hashmap* hm, char* word) {
             /* free the memory used for the node, including the list of documents */
             struct lldoc* iter = node->docptr;
             while(iter != NULL) {
+                /* need a temp because we are freeing iter */
                 struct lldoc* temp = iter->doc_next;
                 free(iter->document_id);
                 free(iter);
                 iter = temp;
             }
+            /* then, free the node word and the node itself */ 
             free(node->word);
             free(node);
             node = NULL;
+            hm->num_elements--;
             return;
         }
         behind = node;
@@ -195,6 +216,27 @@ void hm_remove(struct hashmap* hm, char* word) {
     }
     /* the element was not found in the list */
     printf("%s was not found in the map\n", word);
+}
+
+void printList(struct hashmap* hm) {
+        int i;
+        for(i = 0; i < hm->num_buckets; i++) {
+                struct llnode *currentNode = hm->map[i];
+                printf("bucket %d: \n", i);
+                if(currentNode->word == NULL) {
+                        continue; /* if there's nothing in the bucket, continute to the next bucket */
+                }
+                /* prints out all the elements in the list at the current bucket */
+                while(currentNode != NULL) {
+                        printf("   '%s' : df = %d\n", currentNode->word, currentNode->df_score);
+                        struct lldoc* iter = currentNode->docptr;
+                        while(iter != NULL) {
+                                printf("\t%s: %d\n", iter->document_id, iter->num_occurrences);
+                                iter = iter->doc_next;
+                        }
+                        currentNode = currentNode->next;
+                }
+        }
 }
 
 /* deallocates the hashmap and all of its elements */

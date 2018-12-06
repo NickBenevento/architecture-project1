@@ -1,30 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "hashmap.h"
-#include "array_list.h"
+#include "doclist.h"
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <glob.h>
 
 void printList(struct hashmap* hm);
-void training(struct hashmap *hm);
+void training(struct hashmap *hm, struct docnode* doc_list);
 char *format(char *string);
 char *read_query(void);
-void rank(struct hashmap *hm, char *query);
+void rank(struct hashmap *hm, struct docnode* doc_list, char *query);
 void stop_word(struct hashmap *hm);
 
 /* TODO LIST:
- * fix bug with more than 1 search word
- * clean code up -- get rid of unecessary methods
- * add ability to work for any number of documents (Extra Credit)
  * check after each malloc
  */
 
 int main(void) {
+        struct docnode* doc_list = doc_create();
         int numBuckets;
         char *query;
         char c;
-        int num_documents = 3;
         printf("Enter the number of buckets: ");
         while(scanf("%d", &numBuckets) != 1) {
                 while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
@@ -46,35 +44,52 @@ int main(void) {
                 return 0;
         }
         while ((c = getchar()) != '\n'); /* a buffer to get characters that may have been typed after the entry */
-        struct hashmap *hm = hm_create(numBuckets, num_documents);
-        training(hm);
+
+        struct hashmap *hm = hm_create(numBuckets, 0);
+        training(hm, doc_list);
         stop_word(hm);
         printList(hm);
+        printf("Enter the search query: ");
         query = read_query();
-        rank(hm, query);
+        rank(hm, doc_list, query);
         hm_destroy(hm); /* destroy the list */
         free(query);
+        doc_delete(doc_list);
         return 0;
 }
 
-void training(struct hashmap *hm) {
+void training(struct hashmap *hm, struct docnode* doc_list) {
+        printf("enter the search string: ");
+        char *search_string = read_query(); /* uses the readquery function to get the search string */
+        glob_t result;
+        /* uses glob to search that directory for all the files and store them in result */
+        int retval = glob(search_string, GLOB_ERR, NULL, &result);
         char str[1000];
-        int i;
-        /* loops through the 3 documents */
-        for(i = 1; i < 4; i++) {
-                /* creates either D1, D2, or D3 based on the current loop */
-                char filename[7] = "D .txt";
-                /* adds '1', '2', or '3' based on the iteration */
-                char letter = (char) i + '0'; /* converts the int to char */
-                filename[1] = letter;
-                
+        /* glob returns 0 on success, so if it wasn't 0, then there is a problem */
+        if(retval != 0) {
+                printf("error. could not open the files in the directory with the search string\n");
+                return;
+        }
+        char **file; /* an array of strings that hold the filenames */
+        /* loops through all the filenames that were read by glob */
+        for(file = result.gl_pathv; *file != NULL; file++) {
                 /* tries to open the file */
-                FILE *fp = fopen(filename, "r");
+                FILE *fp = fopen(*file, "r");
                 /* if the file doesn't exist, continues to the next loop */
                 if(fp == NULL) {
-                        printf("the file %s does not exist\n", filename);
+                        printf("the file %s does not exist\n", *file);
                         continue;
                 }
+                int doc_len = strlen(*file);
+                doc_len++;
+                char *document_copy = (char *) malloc(doc_len*sizeof(char));
+                if(!document_copy) {
+                        return;
+                }
+                strcpy(document_copy, *file);
+                /* add the document to the document list */
+                doc_add(doc_list, document_copy);
+                hm->num_documents++; /* the file was opened successfuly, so increase the number of documents */
                 /* loops through all the lines in the file */
                 while(fgets(str, 1000, fp) != NULL) {
                         char *token = strtok(str, " \n\t");
@@ -83,13 +98,19 @@ void training(struct hashmap *hm) {
                                 int len = strlen(token); /* gets the length of the token */
                                 /* creates a new char array to copy the token into */
                                 char *word = (char *) malloc((len+1)*sizeof(char));
+                                if(!word) {
+                                        return;
+                                }
                                 strcpy(word, token);
                                 word = format(word);
                                 /* does the same as above for the document name */
-                                char *document = (char *) malloc(7*sizeof(char));
-                                strcpy(document, filename);
+                                char *document = (char *) malloc(doc_len*sizeof(char));
+                                if(!document) {
+                                        return;
+                                }
+                                strcpy(document, *file);
                                 /* gets the number of occurances of the word + document pair */
-                                int num_count = hm_get(hm, word, document, 1);
+                                int num_count = hm_get(hm, word, document);
                                 /* if the word does not exist in the hashmap, add it to the map */
                                 if(num_count == -1) {
                                         hm_put(hm, word, document, 1);
@@ -103,18 +124,22 @@ void training(struct hashmap *hm) {
                 }
                 fclose(fp);
         }
+        free(search_string); /* free the search string */
+        globfree(&result); /* free the object used for glob */
 }
 
+/* removes any stop words (words that appear in all the documents) */
 void stop_word(struct hashmap *hm) {
         int i;
+        /* loops through all the buckets in the map */
         for(i = 0; i < hm->num_buckets; i++) {
                 struct llnode *node = hm->map[i];
                 if(node->word == NULL) {
                         continue; /* if there's nothing in the bucket, continute to the next bucket */
                 }
                 while(node != NULL) {
-                        //printf("word: %s\n", node->word);
-                        struct llnode *temp = node->next;
+                        struct llnode *temp = node->next; /* need a temp incase the node gets removed */
+                        /* if the word appears in all the documents, remove it */
                         if(node->df_score == hm->num_documents) {
                                 hm_remove(hm, node->word);
                         }
@@ -136,13 +161,17 @@ char *format(char *string) {
         return string;
 }
 
-
+/* reads in a string of any size from the user by dynamically reallocating memory if the strin
+ * runs out of space */
 char *read_query(void) {
-        printf("Enter the search query: ");
-        int len = 5;
-        int size = 0;
+        int len = 5; /* start with a length of 5 */
+        int size = 0; /* initial size of the string is 0 */
         char *query = malloc(len*sizeof(char)); /* start with a string of length 5 */
+        if(!query) {
+                return NULL;
+        }
         char c;
+        /* reads in 1 character at a time while it isn't the enter key */
         while( (c = fgetc(stdin)) != '\n') {
                 c = tolower(c); /*converts char to lowercase */
                 query[size] = c; /* puts the character in the string */
@@ -151,73 +180,55 @@ char *read_query(void) {
                 if( size == len) {
                         len += 1;
                         query = realloc(query, sizeof(char)*len);
+                        if(!query) {
+                                return NULL;
+                        }
                 }
         }
         query[size] = '\0'; /* add the terminating character to the end */
-        printf("query: %s\n", query);
         return query;
 }
 
-void rank(struct hashmap *hm, char *query) {
+/* ranks the documents in terms of relevance to the search query */
+void rank(struct hashmap *hm, struct docnode* doc_list, char *query) {
         double numerator = (double) hm->num_documents;
-        double d1_score = 0;
-        double d2_score = 0;
-        double d3_score = 0;
+        //doc_print(doc_list);
         char *token = strtok(query, " \t\n");
+        /* loops through all the words in the search query */
         while(token != NULL) {
+                /* gets the node for the current word in the query */
                 struct llnode *node = hm_get_word(hm, token);
+                /* if the word isn't in any of the documents, continue to the next word */
                 if(node == NULL) {
                         printf("the word '%s' was not found in any documents.\n", token);
                         token = strtok(NULL, " \t\n");
                         continue;
                 }
-                double x = numerator / (double) node->df_score;
-                double inverse_df = log10(x);
-                printf("word: %s , idf: %f\n", node->word, inverse_df);
+                double denominator = node->df_score;
+                if(denominator == 0) {
+                        denominator = 1;
+                }
+                /* x is the # of documents divided by the document frequency */
+                double x = numerator / denominator;
+                double inverse_df = log10(x); /* gets the inverse doc freq using the log function */
+                //printf("word: %s , idf: %f\n", node->word, inverse_df);
                 node->idf = inverse_df;
-
-                printf("node->score: %f\n", node->idf);
                 struct lldoc *iter = node->docptr;
-                int count = 0;
+                /* loops through all the documents the word appears in */
                 while(iter != NULL) {
-                        if(count == 0) {
-                                d1_score += node->idf*iter->num_occurrences;
+                        struct docnode* doc_iter = doc_list;
+                        /* loops through the document list until it equals the iter's document id */
+                        while(strcmp(doc_iter->document, iter->document_id) != 0) {
+                                doc_iter = doc_iter->next;
                         }
-                        else if(count == 1) {
-                                d2_score += node->idf*iter->num_occurrences;
-                        }
-                        else if(count == 2) {
-                                d3_score += node->idf*iter->num_occurrences;
-                        }
-                        printf("iter->doc: %s\n", iter->document_id);
-                        count++;
+                        printf("iter->doc: %s, adding %f\n", doc_iter->document, node->idf*iter->num_occurrences);
+                        doc_iter->score += node->idf*iter->num_occurrences; /* adds to that document score */
+                        
                         iter = iter->doc_next;
                 }
-                //hm_get_doc_freq(hm, token);
-                token = strtok(NULL, " \t\n");
+                token = strtok(NULL, " \t\n"); /* get the next search word */
         }
-        printf("d1_score: %f\n", d1_score);
-        printf("d2_score: %f\n", d2_score);
-        printf("d3_score: %f\n", d3_score);
+        doc_print_order(doc_list); /* prints the documents in order of relevance */
 }
 
-void printList(struct hashmap* hm) {
-        int i;
-        for(i = 0; i < hm->num_buckets; i++) {
-                struct llnode *currentNode = hm->map[i];
-                printf("bucket %d: \n", i);
-                if(currentNode->word == NULL) {
-                        continue; /* if there's nothing in the bucket, continute to the next bucket */
-                }
-                /* prints out all the elements in the list at the current bucket */
-                while(currentNode != NULL) {
-                        printf("   '%s' : df = %d\n", currentNode->word, currentNode->df_score);
-                        struct lldoc* iter = currentNode->docptr;
-                        while(iter != NULL) {
-                                printf("\t%s: %d\n", iter->document_id, iter->num_occurrences);
-                                iter = iter->doc_next;
-                        }
-                        currentNode = currentNode->next;
-                }
-        }
-}
+
