@@ -14,10 +14,6 @@ char *read_query(void);
 void rank(struct hashmap *hm, struct docnode* doc_list, char *query);
 void stop_word(struct hashmap *hm);
 
-/* TODO LIST:
- * check after each malloc
- */
-
 int main(void) {
         struct docnode* doc_list = doc_create();
         int numBuckets;
