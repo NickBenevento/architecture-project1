@@ -85,6 +85,7 @@ void doc_print(struct docnode* head) {
     }
 }
 
+/* resets the values such as score and flag for the documents */
 void doc_reset(struct docnode* head) {
     if(head == NULL) {
         return;
@@ -101,13 +102,13 @@ void doc_delete(struct docnode* head) {
     if(head == NULL) {
         return;
     }
+    /* frees the memory for the lsit */
     while(head != NULL) {
         struct docnode* temp = head->next;
-        head->document = NULL;
-        head->score = 0;
         free(head->document);
-        head = NULL;
+        head->document = NULL;
         free(head);
+        head = NULL;
         head = temp;
     }
 }

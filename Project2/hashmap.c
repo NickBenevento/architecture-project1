@@ -176,6 +176,7 @@ void hm_remove(struct hashmap* hm, char* word) {
                 /* if the node is the head node and the only node in the bucket */
                 if(node->next == NULL) {
                     free(node->word);
+                    node->word = NULL;
                     free(node);
                     node = NULL;
                     hm->num_elements--;
@@ -200,11 +201,14 @@ void hm_remove(struct hashmap* hm, char* word) {
                 /* need a temp because we are freeing iter */
                 struct lldoc* temp = iter->doc_next;
                 free(iter->document_id);
+                iter->document_id = NULL;
                 free(iter);
+                iter = NULL;
                 iter = temp;
             }
             /* then, free the node word and the node itself */ 
             free(node->word);
+            node->word = NULL;
             free(node);
             node = NULL;
             hm->num_elements--;
@@ -254,17 +258,23 @@ void hm_destroy(struct hashmap* hm) {
             while(ptr != NULL) {
                 struct lldoc* temp2 = ptr->doc_next;
                 free(ptr->document_id);
+                ptr->document_id = NULL;
                 free(ptr);
+                ptr = NULL;
                 ptr = temp2;
             }
             /* free the word and document id */
             free(iter->word);
+            iter->word = NULL;
             free(iter); /* free the node itself */
+            iter = NULL;
             iter = temp;
         }
     }
     free(hm->map);
+    hm->map = NULL;
     free(hm);
+    hm = NULL;
 }
 
 /* takes the given word and document ID and maps them to a bucket in the hashmap.

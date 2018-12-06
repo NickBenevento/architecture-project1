@@ -34,7 +34,6 @@ int main(void) {
                 char buf;
                 /* gets the characters in the buffer */
                 while ((buf = getchar()) != '\n');
-                //getchar();
         }
         /* if the user wants to exit */
         if(c == 'X' || c == 'x') {
@@ -50,7 +49,7 @@ int main(void) {
                         hm_destroy(hm);
                         return 0;
         }
-        stop_word(hm);
+        stop_word(hm); /* removes the stop words */
         /* loop to keep getting search queries */
         while(1) {
                 //printList(hm); /* prints the hashmap for veiwing purposes */
@@ -60,11 +59,12 @@ int main(void) {
                 /* breaks if the user enters '#' */
                 if(query[0] == '#') {
                         free(query);
+                        query = NULL;
                         break;
                 }
                 rank(hm, doc_list, query);
-                query = NULL;
                 free(query);
+                query = NULL;
                 doc_reset(doc_list); /* resets the scores for the documents */
         }
         /* free the memory */
