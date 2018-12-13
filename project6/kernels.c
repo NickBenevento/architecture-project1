@@ -123,51 +123,55 @@ void my_rotate(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 
 /* ANY CHANGES ARE MADE HERE */
 /* below are the main computations for your implementation of the rotate. Any changes in implementation will go here or the other functions it may call */
-	//int a = dim*dim - dim;
-	////dim*dim -dim - dim*j
-	//for (i = 0; i < dim; i++) {
-	//	for (j = 0; j < dim; j++) {
-	//		int x = a - dim*j;
-	//		dst[x + i] = src[(i*dim) + j];
-	//	}
-	//}
-	for (j = 0; j < dim; j+= 4) {
-		for (i = 0; i < dim; i+=4) {
-			//dst[RIDX(dim-1-j, i, dim)] = src[RIDX(i, j, dim)];
-			dst[RIDX(dim-1, i, dim)] = src[RIDX(i, j, dim)];
-			dst[RIDX(dim-1, i+1, dim)] = src[RIDX(i, j+1, dim)];
-			dst[RIDX(dim-1, i+2, dim)] = src[RIDX(i, j+2, dim)];
-			dst[RIDX(dim-1, i+3, dim)] = src[RIDX(i, j+3, dim)];
-
-			dst[RIDX(dim-2, i, dim)] = src[RIDX(i+1, j, dim)];
-			dst[RIDX(dim-2, i+1, dim)] = src[RIDX(i+1, j+1, dim)];
-			dst[RIDX(dim-2, i+2, dim)] = src[RIDX(i+1, j+2, dim)];
-			dst[RIDX(dim-2, i+3, dim)] = src[RIDX(i+1, j+3, dim)];
-
-			dst[RIDX(dim-3, i, dim)] = src[RIDX(i+2, j, dim)];
-			dst[RIDX(dim-3, i+1, dim)] = src[RIDX(i+2, j+1, dim)];
-			dst[RIDX(dim-3, i+2, dim)] = src[RIDX(i+2, j+2, dim)];
-			dst[RIDX(dim-3, i+3, dim)] = src[RIDX(i+2, j+3, dim)];
-
-			dst[RIDX(dim-4, i, dim)] = src[RIDX(i+3, j, dim)];
-			dst[RIDX(dim-4, i+1, dim)] = src[RIDX(i+3, j+1, dim)];
-			dst[RIDX(dim-4, i+2, dim)] = src[RIDX(i+3, j+2, dim)];
-			dst[RIDX(dim-4, i+3, dim)] = src[RIDX(i+3, j+3, dim)];
-
-			//dst[RIDX(dim-2, i, dim)] = src[RIDX(i, j+1, dim)];
-			//dst[RIDX(dim-3, i, dim)] = src[RIDX(i, j+2, dim)];
-			//dst[RIDX(dim-4, i, dim)] = src[RIDX(i, j+3, dim)];
-
-			//dst[RIDX(dim-1, i+1, dim)] = src[RIDX(i, j, dim)];
-			
-
+	//dim*dim -dim - dim*j
+	int a = dim*dim - dim;
+	int b = 0;
+	for (j = 0; j < dim; j++) {
+		if(j != 0) {
+			b += dim;
+		}
+		for (i = 0; i < dim; i++) {
+			dst[a - b + i] = src[(i*dim) + j];
+			//dst[((dim-1-j)*dim+i)] = src[(dim*i+j)];
 		}
 	}
+	//for (j = 0; j < dim; j+= 4) {
+	//	for (i = 0; i < dim; i+=4) {
+	//		//dst[RIDX(dim-1-j, i, dim)] = src[RIDX(i, j, dim)];
+	//		dst[RIDX(dim-1, i, dim)] = src[RIDX(i, j, dim)];
+	//		dst[RIDX(dim-1, i+1, dim)] = src[RIDX(i, j+1, dim)];
+	//		dst[RIDX(dim-1, i+2, dim)] = src[RIDX(i, j+2, dim)];
+	//		dst[RIDX(dim-1, i+3, dim)] = src[RIDX(i, j+3, dim)];
+
+	//		dst[RIDX(dim-2, i, dim)] = src[RIDX(i+1, j, dim)];
+	//		dst[RIDX(dim-2, i+1, dim)] = src[RIDX(i+1, j+1, dim)];
+	//		dst[RIDX(dim-2, i+2, dim)] = src[RIDX(i+1, j+2, dim)];
+	//		dst[RIDX(dim-2, i+3, dim)] = src[RIDX(i+1, j+3, dim)];
+
+	//		dst[RIDX(dim-3, i, dim)] = src[RIDX(i+2, j, dim)];
+	//		dst[RIDX(dim-3, i+1, dim)] = src[RIDX(i+2, j+1, dim)];
+	//		dst[RIDX(dim-3, i+2, dim)] = src[RIDX(i+2, j+2, dim)];
+	//		dst[RIDX(dim-3, i+3, dim)] = src[RIDX(i+2, j+3, dim)];
+
+	//		dst[RIDX(dim-4, i, dim)] = src[RIDX(i+3, j, dim)];
+	//		dst[RIDX(dim-4, i+1, dim)] = src[RIDX(i+3, j+1, dim)];
+	//		dst[RIDX(dim-4, i+2, dim)] = src[RIDX(i+3, j+2, dim)];
+	//		dst[RIDX(dim-4, i+3, dim)] = src[RIDX(i+3, j+3, dim)];
+
+	//		//dst[RIDX(dim-2, i, dim)] = src[RIDX(i, j+1, dim)];
+	//		//dst[RIDX(dim-3, i, dim)] = src[RIDX(i, j+2, dim)];
+	//		//dst[RIDX(dim-4, i, dim)] = src[RIDX(i, j+3, dim)];
+
+	//		//dst[RIDX(dim-1, i+1, dim)] = src[RIDX(i, j, dim)];
+	//		
+
+	//	}
+	//}
 
 	/* change list:
-	 * 1) inlining function ridx: 1.7% total increase
-	 * 2) moving computation outside for loop: 4.7% total increase
-	 * 3) switching for loop order: locality of access: 48.5%
+	 * 1) inlining function ridx: 2.8% total increase
+	 * 2) moving computation outside for loop: 1.1% total increase
+	 * 3) switching for loop order: locality of access: bad
 	 */
 
 /* end of computation for rotate function. any changes you make should be made above this line. */
@@ -288,6 +292,7 @@ void naive_smooth(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned lo
 		for (i = 0; i < dim; i++)
 			dst[RIDX(i, j, dim)] = avg(dim, i, j, src);
 
+
 /* the remaining lines in this function stop the measurement and set the values before returning. */
 	rusage_end_time = getUserTime();
         rdtsc_end_time = rdtsc();
@@ -313,15 +318,27 @@ void my_smooth(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 	
 /* ANY CHANGES TO BE MADE SHOULD BE BELOW HERE */
 /* below are the main computations for your implementation of the smooth function. Any changes in implementation will go here or the other functiosn it calls */
+	int a, b;
+	pixel_sum sum;
+	pixel current_pixel;
+	for (i = 0; i < dim; i++) {
+		for (j = 0; j < dim; j++) {
+			initialize_pixel_sum(&sum);
+			for(a = maximum(i-1, 0); a <= minimum(i+1, dim-1); a++) 
+				for(b = maximum(j-1, 0); b <= minimum(j+1, dim-1); b++) 
+					accumulate_sum(&sum, src[a*dim+b]);
 
-	for (j = 0; j < dim; j++)
-		for (i = 0; i < dim; i++)
-			dst[i*dim +j] = avg(dim, i, j, src);
-			//i*dim + j
+			pixel *ptr_pixel = &current_pixel;
+			ptr_pixel->red = (unsigned short) (sum.red/sum.num);
+			ptr_pixel->green = (unsigned short) (sum.green/sum.num);
+			ptr_pixel->blue = (unsigned short) (sum.blue/sum.num);
+			dst[i*dim+j] = current_pixel;
+		}
+	}
 
 	/* Change List:
-	 * 1) inline ridx: 
-	 * 2)
+	 * 1) inline ridx, average, and assign, moving varible definitions: 8% 
+	 * 2) switch for loops: 41% increase
 	 */
 
 /* end of computation for smooth function. so don't change anything after this in this function. */
