@@ -165,8 +165,8 @@ void my_rotate(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 	//		//dst[RIDX(dim-1, i+1, dim)] = src[RIDX(i, j, dim)];
 	//		
 
-	//	}
-	//}
+		}
+	}
 
 	/* change list:
 	 * 1) inlining function ridx: 2.8% total increase
@@ -318,15 +318,15 @@ void my_smooth(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 	
 /* ANY CHANGES TO BE MADE SHOULD BE BELOW HERE */
 /* below are the main computations for your implementation of the smooth function. Any changes in implementation will go here or the other functiosn it calls */
-	int a, b;
+	int ii, jj;
 	pixel_sum sum;
 	pixel current_pixel;
 	for (i = 0; i < dim; i++) {
 		for (j = 0; j < dim; j++) {
 			initialize_pixel_sum(&sum);
-			for(a = maximum(i-1, 0); a <= minimum(i+1, dim-1); a++) 
-				for(b = maximum(j-1, 0); b <= minimum(j+1, dim-1); b++) 
-					accumulate_sum(&sum, src[a*dim+b]);
+			for(ii = ( (i-1) > 0 ? (i-1) : 0 ); ii <= ( (i+1) < (dim-1) ? (i+1) : (dim-1) ); ii++) 
+				for(jj = maximum(j-1, 0); jj <= minimum(j+1, dim-1); jj++) 
+					accumulate_sum(&sum, src[ii*dim+jj]);
 
 			pixel *ptr_pixel = &current_pixel;
 			ptr_pixel->red = (unsigned short) (sum.red/sum.num);
