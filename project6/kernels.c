@@ -123,12 +123,44 @@ void my_rotate(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 
 /* ANY CHANGES ARE MADE HERE */
 /* below are the main computations for your implementation of the rotate. Any changes in implementation will go here or the other functions it may call */
-	int a = dim*dim - dim;
-	//dim*dim -dim - dim*j
-	for (i = 0; i < dim; i++) {
-		for (j = 0; j < dim; j++) {
-			int x = a - dim*j;
-			dst[x + i] = src[(i*dim) + j];
+	//int a = dim*dim - dim;
+	////dim*dim -dim - dim*j
+	//for (i = 0; i < dim; i++) {
+	//	for (j = 0; j < dim; j++) {
+	//		int x = a - dim*j;
+	//		dst[x + i] = src[(i*dim) + j];
+	//	}
+	//}
+	for (j = 0; j < dim; j+= 4) {
+		for (i = 0; i < dim; i+=4) {
+			//dst[RIDX(dim-1-j, i, dim)] = src[RIDX(i, j, dim)];
+			dst[RIDX(dim-1, i, dim)] = src[RIDX(i, j, dim)];
+			dst[RIDX(dim-1, i-1, dim)] = src[RIDX(i-1, j, dim)];
+			dst[RIDX(dim-1, i-2, dim)] = src[RIDX(i-2, j, dim)];
+			dst[RIDX(dim-1, i-3, dim)] = src[RIDX(i-3, j, dim)];
+
+			dst[RIDX(dim-2, i, dim)] = src[RIDX(i, j-1, dim)];
+			dst[RIDX(dim-2, i-1, dim)] = src[RIDX(i-1, j-1, dim)];
+			dst[RIDX(dim-2, i-2, dim)] = src[RIDX(i-2, j-1, dim)];
+			dst[RIDX(dim-2, i-3, dim)] = src[RIDX(i-3, j-1, dim)];
+
+			dst[RIDX(dim-3, i, dim)] = src[RIDX(i, j-2, dim)];
+			dst[RIDX(dim-3, i-1, dim)] = src[RIDX(i-1, j-2, dim)];
+			dst[RIDX(dim-3, i-2, dim)] = src[RIDX(i-2, j-2, dim)];
+			dst[RIDX(dim-3, i-3, dim)] = src[RIDX(i-3, j-2, dim)];
+
+			dst[RIDX(dim-4, i, dim)] = src[RIDX(i, j-3, dim)];
+			dst[RIDX(dim-4, i-1, dim)] = src[RIDX(i-1, j-3, dim)];
+			dst[RIDX(dim-4, i-2, dim)] = src[RIDX(i-2, j-3, dim)];
+			dst[RIDX(dim-4, i-3, dim)] = src[RIDX(i-3, j-3, dim)];
+
+			//dst[RIDX(dim-2, i, dim)] = src[RIDX(i, j+1, dim)];
+			//dst[RIDX(dim-3, i, dim)] = src[RIDX(i, j+2, dim)];
+			//dst[RIDX(dim-4, i, dim)] = src[RIDX(i, j+3, dim)];
+
+			//dst[RIDX(dim-1, i+1, dim)] = src[RIDX(i, j, dim)];
+			
+
 		}
 	}
 
