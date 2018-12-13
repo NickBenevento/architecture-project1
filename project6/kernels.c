@@ -327,7 +327,7 @@ void my_smooth(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 			new->red = new->green = new->blue = new->num = 0;
 			//initialize_pixel_sum(&sum);
 			for(ii = ( (i-1) > 0 ? (i-1) : 0 ); ii <= ( (i+1) < (dim-1) ? (i+1) : (dim-1) ); ii++) {
-				for(jj = maximum(j-1, 0); jj <= minimum(j+1, dim-1); jj++) {
+				for(jj = (j-1) > 0 ? (j-1) : 0; jj <= ( (j+1) < (dim-1) ? (j+1) : (dim-1); jj++) {
 					pixel p = src[ii*dim+jj];
 					new->red += (int) p.red;
 					new->green += (int) p.green;
